@@ -32,4 +32,9 @@ class Customer extends Authenticatable
             'birthdate' => 'date',
         ];
     }
+    
+    public function maintenanceRequests()
+    {
+        return $this->hasMany(MaintenanceRequest::class);
+    }
 }
