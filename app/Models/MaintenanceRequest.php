@@ -20,7 +20,11 @@ class MaintenanceRequest extends Model
         'device_model',
         'problem_description',
         'status',
-        'estimated_cost'
+        'customer_status',
+        'rejection_reason',
+        'payment_method',
+        'estimated_cost',
+        'estimated_days',
     ];
 
     protected static function boot()
@@ -39,5 +43,10 @@ class MaintenanceRequest extends Model
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class);
+    }
+
+    public function parts()
+    {
+        return $this->hasMany(MaintenanceRequestPart::class);
     }
 }

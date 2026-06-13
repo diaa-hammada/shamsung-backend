@@ -14,9 +14,11 @@ class Shop extends Model
     protected $fillable = [
         'name',
         'address',
+        'phone',
+        'image_path',
+        'rating',
         'latitude',
         'longitude',
-        'phone',
         'is_active',
     ];
 
@@ -25,7 +27,13 @@ class Shop extends Model
         return [
             'latitude' => 'float',
             'longitude' => 'float',
+            'rating' => 'float',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function maintenanceRequests()
+    {
+        return $this->hasMany(MaintenanceRequest::class);
     }
 }

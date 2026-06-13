@@ -17,6 +17,10 @@ return [
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
+    
+    'gemini' => [
+        'keys' => env('GEMINI_API_KEYS'),
+    ],
 
     'resend' => [
         'key' => env('RESEND_API_KEY'),

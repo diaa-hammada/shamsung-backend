@@ -16,7 +16,7 @@ class CheckoutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', 'string', 'in:cash,electronic'],
+            'payment_method' => ['required', 'string', 'in:cash_on_delivery,pay_after_service'],
         ];
     }
 }

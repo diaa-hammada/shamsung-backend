@@ -18,10 +18,9 @@ class RegisterCustomerRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name'  => ['required', 'string', 'max:255'],
-            'phone'      => ['required', 'string', 'max:20', 'unique:customers,phone'],
-            'email'      => ['required', 'string', 'email', 'max:255', 'unique:customers,email'],
-            'password'   => ['required', 'string', 'min:8', 'confirmed'],
-            'birthdate'  => ['nullable', 'date'],
+            'phone'     => ['required', 'string', 'max:20', 'unique:customers,phone'],
+            'email'     => ['required', 'string', 'email', 'max:255', 'unique:customers,email'],
+            'birthdate' => ['nullable', 'date'],
         ];
     }
 }
