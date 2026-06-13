@@ -20,7 +20,7 @@ class AccessoryController extends Controller
             $query->where('shop_id', (int) $request->input('shop_id'));
         }
 
-        $accessories = $query->latest()->get();
+        $accessories = $query->latest()->paginate(15);
 
         return response()->json([
             'message' => 'Accessories retrieved successfully',

@@ -6,12 +6,16 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Order\CheckoutRequest;
+use App\Models\Delivery;
+use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
 class OrderController extends Controller
 {
+    public function __construct(private readonly FcmService $fcm) {}
+
     public function checkout(CheckoutRequest $request): JsonResponse
     {
         /** @var \App\Models\Customer $customer */
@@ -57,6 +61,17 @@ class OrderController extends Controller
                         $item->accessory->decrement('stock_quantity', $item->quantity);
                     }
 
+                    Delivery::create([
+                        'type'           => 'accessory_delivery',
+                        'status'         => 'pending',
+                        'customer_id'    => $customer->id,
+                        'shop_id'        => $shopId,
+                        'order_id'       => $order->id,
+                        'payment_method' => $request->validated('payment_method') === 'cash_on_delivery'
+                                               ? 'cash_on_delivery'
+                                               : 'prepaid',
+                    ]);
+
                     $createdOrders[] = $order->load('items.accessory:id,name', 'shop:id,name');
                 }
 
@@ -64,6 +79,17 @@ class OrderController extends Controller
 
                 return $createdOrders;
             });
+
+            try {
+                if ($customer->fcm_token) {
+                    $this->fcm->send(
+                        $customer->fcm_token,
+                        'تم إنشاء طلب التوصيل',
+                        'سيتم توصيل طلبك قريباً.',
+                        ['type' => 'delivery'],
+                    );
+                }
+            } catch (\Throwable) {}
 
             return response()->json([
                 'message' => 'Checkout completed successfully',
@@ -85,7 +111,7 @@ class OrderController extends Controller
         $orders = $customer->orders()
             ->with(['shop:id,name', 'items.accessory:id,name'])
             ->latest()
-            ->get();
+            ->paginate(15);
 
         return response()->json([
             'message' => 'Orders retrieved successfully',
