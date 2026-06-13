@@ -7,9 +7,11 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Admin\StoreDeliveryRequest;
 use App\Http\Requests\Api\V1\Admin\UpdateDeliveryRequest;
+use App\Models\Admin;
 use App\Models\Customer;
 use App\Models\Delivery;
 use App\Models\DeliveryWorker;
+use App\Models\Notification;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 
@@ -40,8 +42,10 @@ class AdminDeliveryController extends Controller
 
         $delivery = Delivery::create($validated);
 
+        $delivery->load(['customer:id,first_name,last_name,phone', 'shop:id,name']);
+
         try {
-            $customer = Customer::find($validated['customer_id']);
+            $customer = $delivery->customer;
             if ($customer?->fcm_token) {
                 $this->fcm->send(
                     $customer->fcm_token,
@@ -52,12 +56,26 @@ class AdminDeliveryController extends Controller
             }
         } catch (\Throwable) {}
 
+        $customerName = $delivery->customer
+            ? trim($delivery->customer->first_name . ' ' . $delivery->customer->last_name)
+            : 'عميل';
+
+        Admin::all()->each(function (Admin $admin) use ($delivery, $customerName, $validated) {
+            Notification::create([
+                'admin_id' => $admin->id,
+                'type'     => 'new_delivery',
+                'title'    => 'توصيلة جديدة',
+                'body'     => "تم إنشاء توصيلة {$validated['type']} للعميل {$customerName}",
+                'data'     => [
+                    'delivery_id' => $delivery->id,
+                    'customer_id' => $delivery->customer_id,
+                ],
+            ]);
+        });
+
         return response()->json([
             'message' => 'Delivery created successfully',
-            'data'    => $delivery->load([
-                'customer:id,first_name,last_name,phone',
-                'shop:id,name',
-            ]),
+            'data'    => $delivery,
         ], 201);
     }
 

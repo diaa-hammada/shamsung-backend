@@ -8161,6 +8161,188 @@
       "name": "Admin Web",
       "item": [
         {
+          "name": "Notifications",
+          "item": [
+            {
+              "name": "Get Notifications",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/admin/notifications",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "notifications"
+                  ]
+                },
+                "description": "Returns latest 20 admin notifications with unread count. Ordered by created_at DESC."
+              },
+              "response": [
+                {
+                  "name": "200 - Notifications retrieved",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/admin/notifications",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "notifications"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"message\": \"Notifications retrieved successfully\",\n  \"data\": {\n    \"unread_count\": 3,\n    \"notifications\": [\n      {\n        \"id\": 3,\n        \"type\": \"new_delivery\",\n        \"title\": \"توصيلة جديدة\",\n        \"body\": \"تم إنشاء توصيلة accessory_delivery للعميل محمد الأحمد\",\n        \"data\": {\n          \"delivery_id\": 2,\n          \"customer_id\": 9\n        },\n        \"is_read\": false,\n        \"created_at\": \"2026-06-13T19:42:29.000000Z\"\n      },\n      {\n        \"id\": 2,\n        \"type\": \"stock_request\",\n        \"title\": \"طلب توريد جديد\",\n        \"body\": \"تم طلب 30 وحدة من iPhone 13 Pro Screen لصالة Al-Mazzah Main Center\",\n        \"data\": {\n          \"stock_request_id\": 3,\n          \"shop_id\": 1,\n          \"spare_part_id\": 1\n        },\n        \"is_read\": false,\n        \"created_at\": \"2026-06-13T19:41:54.000000Z\"\n      },\n      {\n        \"id\": 1,\n        \"type\": \"new_maintenance_request\",\n        \"title\": \"طلب صيانة جديد\",\n        \"body\": \"قدّم محمد الأحمد طلب صيانة لجهاز Samsung S24 Ultra\",\n        \"data\": {\n          \"request_id\": 6,\n          \"shop_id\": 1\n        },\n        \"is_read\": false,\n        \"created_at\": \"2026-06-13T19:41:53.000000Z\"\n      }\n    ]\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Mark Single Notification Read",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/admin/notifications/1/read",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "notifications",
+                    "1",
+                    "read"
+                  ]
+                },
+                "description": "Marks a single notification as is_read = true."
+              },
+              "response": [
+                {
+                  "name": "200 - Notification marked as read",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/admin/notifications/1/read",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "notifications",
+                        "1",
+                        "read"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\"message\": \"Notification marked as read\"}"
+                }
+              ]
+            },
+            {
+              "name": "Mark All Notifications Read",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/admin/notifications/mark-all-read",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "notifications",
+                    "mark-all-read"
+                  ]
+                },
+                "description": "Marks all admin notifications as is_read = true."
+              },
+              "response": [
+                {
+                  "name": "200 - All marked as read",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base_url}}/admin/notifications/mark-all-read",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "admin",
+                        "notifications",
+                        "mark-all-read"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\"message\": \"All notifications marked as read\"}"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Authentication",
           "item": [
             {

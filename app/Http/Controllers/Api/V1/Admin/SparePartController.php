@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Admin\RequestStockRequest;
 use App\Http\Requests\Api\V1\Admin\StoreSparePartRequest;
 use App\Http\Requests\Api\V1\Admin\UpdateSparePartRequest;
+use App\Models\Admin;
+use App\Models\Notification;
 use App\Models\SparePart;
 use App\Models\StockRequest;
 use Illuminate\Http\JsonResponse;
@@ -72,10 +74,29 @@ class SparePartController extends Controller
     public function requestStock(RequestStockRequest $request): JsonResponse
     {
         $stockRequest = StockRequest::create($request->validated());
+        $stockRequest->load(['shop:id,name', 'sparePart:id,name']);
+
+        $sparePartName = $stockRequest->sparePart->name;
+        $shopName      = $stockRequest->shop->name;
+        $quantity      = $stockRequest->quantity;
+
+        Admin::all()->each(function (Admin $admin) use ($stockRequest, $quantity, $sparePartName, $shopName) {
+            Notification::create([
+                'admin_id' => $admin->id,
+                'type'     => 'stock_request',
+                'title'    => 'طلب توريد جديد',
+                'body'     => "تم طلب {$quantity} وحدة من {$sparePartName} لصالة {$shopName}",
+                'data'     => [
+                    'stock_request_id' => $stockRequest->id,
+                    'shop_id'          => $stockRequest->shop_id,
+                    'spare_part_id'    => $stockRequest->spare_part_id,
+                ],
+            ]);
+        });
 
         return response()->json([
             'message' => 'Stock request submitted successfully',
-            'data'    => $stockRequest->load(['shop:id,name', 'sparePart:id,name']),
+            'data'    => $stockRequest,
         ], 201);
     }
 

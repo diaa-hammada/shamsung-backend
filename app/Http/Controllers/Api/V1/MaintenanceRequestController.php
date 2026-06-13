@@ -8,8 +8,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Customer\ApproveMaintenanceRequest;
 use App\Http\Requests\Api\V1\Customer\RejectMaintenanceRequest;
 use App\Http\Requests\Api\V1\Maintenance\StoreMaintenanceRequest;
+use App\Models\Admin;
 use App\Models\Delivery;
 use App\Models\MaintenanceRequest;
+use App\Models\Notification;
 use App\Models\SparePart;
 use App\Models\Technician;
 use App\Services\FcmService;
@@ -32,6 +34,18 @@ class MaintenanceRequestController extends Controller
             'A new device repair request has been submitted.',
             ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
         );
+
+        $customerName = trim($customer->first_name . ' ' . $customer->last_name);
+        $deviceModel  = $request->validated('device_model');
+        Admin::all()->each(function (Admin $admin) use ($maintenanceRequest, $customerName, $deviceModel) {
+            Notification::create([
+                'admin_id' => $admin->id,
+                'type'     => 'new_maintenance_request',
+                'title'    => 'طلب صيانة جديد',
+                'body'     => "قدّم {$customerName} طلب صيانة لجهاز {$deviceModel}",
+                'data'     => ['request_id' => $maintenanceRequest->id, 'shop_id' => $maintenanceRequest->shop_id],
+            ]);
+        });
 
         return response()->json([
             'message' => 'Maintenance request submitted successfully',

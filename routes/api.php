@@ -132,6 +132,11 @@ Route::prefix('v1/admin')->group(function () {
         Route::put('/delivery-workers/{id}', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'update']);
         Route::delete('/delivery-workers/{id}', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'destroy']);
 
+        // Notifications
+        Route::get('/notifications', [\App\Http\Controllers\Api\V1\Admin\AdminNotificationController::class, 'index']);
+        Route::post('/notifications/mark-all-read', [\App\Http\Controllers\Api\V1\Admin\AdminNotificationController::class, 'markAllRead']);
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\V1\Admin\AdminNotificationController::class, 'markRead']);
+
         // Dashboard
         Route::get('/dashboard/stats', [\App\Http\Controllers\Api\V1\Admin\AdminDashboardController::class, 'stats']);
 
