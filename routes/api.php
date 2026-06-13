@@ -98,6 +98,7 @@ Route::prefix('v1/admin')->group(function () {
         Route::post('/profile', [\App\Http\Controllers\Api\V1\Admin\AdminAuthController::class, 'updateProfile']);
         Route::post('/change-password', [\App\Http\Controllers\Api\V1\Admin\AdminAuthController::class, 'changePassword']);
         Route::post('/logout', [\App\Http\Controllers\Api\V1\Admin\AdminAuthController::class, 'logout']);
+        Route::post('/update-fcm-token', [\App\Http\Controllers\Api\V1\Admin\AdminAuthController::class, 'updateFcmToken']);
 
         // Shops
         Route::get('/shops', [\App\Http\Controllers\Api\V1\Admin\ShopController::class, 'index']);
