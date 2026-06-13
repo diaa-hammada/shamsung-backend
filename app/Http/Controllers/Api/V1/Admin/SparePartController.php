@@ -11,6 +11,7 @@ use App\Http\Requests\Api\V1\Admin\UpdateSparePartRequest;
 use App\Models\SparePart;
 use App\Models\StockRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class SparePartController extends Controller
 {
@@ -51,6 +52,20 @@ class SparePartController extends Controller
 
         return response()->json([
             'message' => 'Spare part deleted successfully',
+        ], 200);
+    }
+
+    public function indexStockRequests(Request $request): JsonResponse
+    {
+        $query = StockRequest::with(['shop:id,name', 'sparePart:id,name'])->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return response()->json([
+            'message' => 'Stock requests retrieved successfully',
+            'data'    => $query->paginate(15),
         ], 200);
     }
 

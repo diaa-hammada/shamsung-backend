@@ -116,6 +116,7 @@ Route::prefix('v1/admin')->group(function () {
         Route::post('/spare-parts', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'store']);
         Route::put('/spare-parts/{id}', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'update']);
         Route::delete('/spare-parts/{id}', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'destroy']);
+        Route::get('/stock-requests', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'indexStockRequests']);
         Route::post('/stock-requests', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'requestStock']);
         Route::post('/stock-requests/{id}/approve', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'approveStockRequest']);
 
