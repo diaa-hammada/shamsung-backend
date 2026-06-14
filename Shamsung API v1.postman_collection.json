@@ -5336,7 +5336,7 @@
           "name": "Consultations",
           "item": [
             {
-              "name": "Get Pending Consultations",
+              "name": "Get All Consultations",
               "request": {
                 "method": "GET",
                 "header": [],
@@ -5353,7 +5353,7 @@
               },
               "response": [
                 {
-                  "name": "✅ 200 Success",
+                  "name": "✅ 200 Success (pending + answered)",
                   "originalRequest": {
                     "method": "GET",
                     "header": [],
@@ -5402,7 +5402,7 @@
                     }
                   ],
                   "cookie": [],
-                  "body": "{\n    \"message\": \"Pending technician consultations retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 2,\n            \"customer_id\": 2,\n            \"technician_id\": null,\n            \"consultation_type\": \"technician\",\n            \"message\": \"بدي أسأل إذا بتصلحوا بورد آيفون 11؟\",\n            \"image_path\": \"consultations/tbS96OQdTea9tWx91Sq0cEgAfixZ5vSCoH3NguHA.jpg\",\n            \"reply\": null,\n            \"status\": \"pending\",\n            \"created_at\": \"2026-05-16T17:36:57.000000Z\",\n            \"updated_at\": \"2026-05-16T17:36:57.000000Z\",\n            \"customer\": {\n                \"id\": 2,\n                \"first_name\": \"Mouayad\",\n                \"last_name\": \"Shwin\"\n            }\n        }\n    ]\n}"
+                  "body": "{\n    \"message\": \"Technician consultations retrieved successfully\",\n    \"data\": {\n        \"current_page\": 1,\n        \"data\": [\n            {\n                \"id\": 5,\n                \"customer_id\": 9,\n                \"technician_id\": 8,\n                \"consultation_type\": \"technician\",\n                \"message\": \"جهازي لا يشتغل بعد السقوط\",\n                \"image_path\": null,\n                \"reply\": \"مرحباً، شكراً على سؤالك. يبدو أن المشكلة في شاشة الجهاز.\",\n                \"status\": \"answered\",\n                \"created_at\": \"2026-06-13T10:00:00.000000Z\",\n                \"updated_at\": \"2026-06-13T10:30:00.000000Z\",\n                \"customer\": {\n                    \"id\": 9,\n                    \"first_name\": \"محمد\",\n                    \"last_name\": \"الأحمد\"\n                }\n            },\n            {\n                \"id\": 4,\n                \"customer_id\": 9,\n                \"technician_id\": null,\n                \"consultation_type\": \"technician\",\n                \"message\": \"البطارية تنفد بسرعة\",\n                \"image_path\": null,\n                \"reply\": null,\n                \"status\": \"pending\",\n                \"created_at\": \"2026-06-13T09:00:00.000000Z\",\n                \"updated_at\": \"2026-06-13T09:00:00.000000Z\",\n                \"customer\": {\n                    \"id\": 9,\n                    \"first_name\": \"محمد\",\n                    \"last_name\": \"الأحمد\"\n                }\n            }\n        ],\n        \"per_page\": 15,\n        \"total\": 2,\n        \"last_page\": 1,\n        \"from\": 1,\n        \"to\": 2,\n        \"next_page_url\": null,\n        \"prev_page_url\": null\n    }\n}"
                 }
               ]
             },

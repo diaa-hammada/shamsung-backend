@@ -19,12 +19,11 @@ class ConsultationController extends Controller
     {
         $consultations = Consultation::with('customer:id,first_name,last_name')
             ->where('consultation_type', 'technician')
-            ->where('status', 'pending')
             ->latest()
             ->paginate(15);
 
         return response()->json([
-            'message' => 'Pending technician consultations retrieved successfully',
+            'message' => 'Technician consultations retrieved successfully',
             'data'    => $consultations,
         ], 200);
     }
@@ -35,7 +34,6 @@ class ConsultationController extends Controller
 
         $consultation = Consultation::with('customer')
             ->where('consultation_type', 'technician')
-            ->where('status', 'pending')
             ->findOrFail($id);
 
         $consultation->update([
