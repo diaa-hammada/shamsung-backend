@@ -25,6 +25,7 @@ class StoreTechnicianRequest extends FormRequest
             'experience'     => ['required', 'string', 'max:255'],
             'birthdate'      => ['nullable', 'date'],
             'is_active'      => ['boolean'],
+            'password'       => ['nullable', 'string', 'min:8'],
         ];
     }
 }

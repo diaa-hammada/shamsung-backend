@@ -28,10 +28,11 @@ class TechnicianController extends Controller
 
     public function store(StoreTechnicianRequest $request): JsonResponse
     {
-        $validated                  = $request->validated();
-        $validated['is_active']     = $validated['is_active'] ?? true;
-        $temporaryPassword          = Str::random(10);
-        $validated['password']      = $temporaryPassword; // hashed cast bcrypts on create
+        $validated              = $request->validated();
+        $validated['is_active'] = $validated['is_active'] ?? true;
+
+        $temporaryPassword      = $validated['password'] ?? Str::random(10);
+        $validated['password']  = $temporaryPassword; // hashed cast bcrypts on create
 
         $technician = Technician::create($validated);
 
