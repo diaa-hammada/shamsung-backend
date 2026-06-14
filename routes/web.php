@@ -54,7 +54,7 @@ Route::get('/deploy/fix-technician-passwords/{key}', function (string $key) use 
     foreach ([4, 5] as $id) {
         $tech = App\Models\Technician::find($id);
         if ($tech) {
-            $tech->password = 'password123'; // hashed cast bcrypts automatically
+            $tech->password = 'password123';
             $tech->save();
             $ok = Illuminate\Support\Facades\Hash::check('password123', $tech->fresh()->password);
             $results[] = "ID {$id} ({$tech->email}): " . ($ok ? '✅ fixed' : '❌ still broken');
@@ -64,4 +64,28 @@ Route::get('/deploy/fix-technician-passwords/{key}', function (string $key) use 
     }
 
     return response('<pre>' . implode("\n", $results) . '</pre>');
+});
+
+// Reset any technician's password by email
+// Usage: /deploy/reset-tech-password/{key}/{email}/{new_password}
+Route::get('/deploy/reset-tech-password/{key}/{email}/{new_password}', function (string $key, string $email, string $new_password) use ($deployKey) {
+    if ($key !== $deployKey) {
+        abort(403, 'Forbidden');
+    }
+
+    $tech = App\Models\Technician::where('email', $email)->first();
+
+    if (! $tech) {
+        return response('<pre>❌ No technician found with email: ' . htmlspecialchars($email) . '</pre>');
+    }
+
+    $tech->password = $new_password; // hashed cast bcrypts automatically
+    $tech->save();
+
+    $ok = Illuminate\Support\Facades\Hash::check($new_password, $tech->fresh()->password);
+
+    return response('<pre>' . ($ok ? '✅ Success' : '❌ Failed') . '
+Email:    ' . $tech->email . '
+Password: ' . htmlspecialchars($new_password) . '
+ID:       ' . $tech->id . '</pre>');
 });
