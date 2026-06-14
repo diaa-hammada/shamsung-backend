@@ -72,6 +72,10 @@ Route::prefix('v1/technician')->group(function () {
 
         Route::get('/consultations', [\App\Http\Controllers\Api\V1\Technician\ConsultationController::class, 'index']);
         Route::post('/consultations/{id}/reply', [\App\Http\Controllers\Api\V1\Technician\ConsultationController::class, 'reply']);
+
+        Route::get('/notifications', [\App\Http\Controllers\Api\V1\Technician\NotificationController::class, 'index']);
+        Route::post('/notifications/mark-all-read', [\App\Http\Controllers\Api\V1\Technician\NotificationController::class, 'markAllRead']);
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\V1\Technician\NotificationController::class, 'markRead']);
     });
 });
 
