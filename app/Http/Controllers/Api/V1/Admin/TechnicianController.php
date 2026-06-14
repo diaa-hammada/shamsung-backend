@@ -10,6 +10,7 @@ use App\Http\Requests\Api\V1\Admin\UpdateTechnicianRequest;
 use App\Models\Technician;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 class TechnicianController extends Controller
 {
@@ -27,22 +28,33 @@ class TechnicianController extends Controller
 
     public function store(StoreTechnicianRequest $request): JsonResponse
     {
-        $validated              = $request->validated();
-        $validated['is_active'] = $validated['is_active'] ?? true;
+        $validated                  = $request->validated();
+        $validated['is_active']     = $validated['is_active'] ?? true;
+        $temporaryPassword          = Str::random(10);
+        $validated['password']      = $temporaryPassword; // hashed cast bcrypts on create
 
         $technician = Technician::create($validated);
 
         return response()->json([
             'message' => 'Technician created successfully',
-            'data'    => $technician->load('shop:id,name'),
+            'data'    => array_merge(
+                $technician->load('shop:id,name')->toArray(),
+                ['temporary_password' => $temporaryPassword]
+            ),
         ], 201);
     }
 
     public function update(UpdateTechnicianRequest $request, int $id): JsonResponse
     {
-        $technician    = Technician::findOrFail($id);
-        $wasActive     = $technician->is_active;
-        $validated     = $request->validated();
+        $technician = Technician::findOrFail($id);
+        $wasActive  = $technician->is_active;
+        $validated  = $request->validated();
+
+        // Handle password separately so the hashed cast fires via setAttribute
+        if (array_key_exists('password', $validated)) {
+            $technician->password = $validated['password'];
+            unset($validated['password']);
+        }
 
         $technician->update($validated);
 

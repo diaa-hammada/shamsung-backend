@@ -10122,7 +10122,7 @@
                     }
                   ],
                   "cookie": [],
-                  "body": "{\n    \"message\": \"Technician created successfully\",\n    \"data\": {\n        \"first_name\": \"Ahmad\",\n        \"last_name\": \"Tech\",\n        \"email\": \"ahmad.tech@shamsung.com\",\n        \"phone\": \"0933444555\",\n        \"shop_id\": 4,\n        \"specialization\": \"Hardware Repair\",\n        \"experience\": \"5 Years\",\n        \"birthdate\": \"1995-05-15T00:00:00.000000Z\",\n        \"is_active\": true,\n        \"updated_at\": \"2026-05-16T20:36:50.000000Z\",\n        \"created_at\": \"2026-05-16T20:36:50.000000Z\",\n        \"id\": 2,\n        \"shop\": {\n            \"id\": 4,\n            \"name\": \"Shamsung Aleppo Center\"\n        }\n    }\n}"
+                  "body": "{\n    \"message\": \"Technician created successfully\",\n    \"data\": {\n        \"first_name\": \"Ahmad\",\n        \"last_name\": \"Tech\",\n        \"email\": \"ahmad.tech@shamsung.com\",\n        \"phone\": \"0933444555\",\n        \"shop_id\": 4,\n        \"specialization\": \"Hardware Repair\",\n        \"experience\": \"5 Years\",\n        \"birthdate\": \"1995-05-15T00:00:00.000000Z\",\n        \"is_active\": true,\n        \"updated_at\": \"2026-05-16T20:36:50.000000Z\",\n        \"created_at\": \"2026-05-16T20:36:50.000000Z\",\n        \"id\": 2,\n        \"shop\": {\n            \"id\": 4,\n            \"name\": \"Shamsung Aleppo Center\"\n        },\n        \"temporary_password\": \"H8Td1hS5Ai\"\n    }\n}"
                 },
                 {
                   "name": "❌ 422 Email Taken",

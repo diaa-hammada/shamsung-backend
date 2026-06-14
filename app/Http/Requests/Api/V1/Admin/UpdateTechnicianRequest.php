@@ -27,6 +27,7 @@ class UpdateTechnicianRequest extends FormRequest
             'experience'     => ['sometimes', 'required', 'string', 'max:255'],
             'birthdate'      => ['nullable', 'date'],
             'is_active'      => ['boolean'],
+            'password'       => ['sometimes', 'string', 'min:8'],
         ];
     }
 }
