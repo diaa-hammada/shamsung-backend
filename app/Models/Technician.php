@@ -20,6 +20,7 @@ class Technician extends Authenticatable
         'birthdate',
         'email',
         'phone',
+        'password',
         'specialization',
         'experience',
         'is_active',
@@ -35,6 +36,7 @@ class Technician extends Authenticatable
         return [
             'birthdate' => 'date',
             'is_active' => 'boolean',
+            'password'  => 'hashed',
         ];
     }
 

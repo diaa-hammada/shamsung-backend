@@ -8,6 +8,11 @@ use App\Http\Controllers\Api\V1\ShopController;
 use App\Http\Controllers\Api\V1\MaintenanceRequestController;
 use App\Http\Controllers\Api\V1\AccessoryController;
 
+// Unified login for Admin and Technician (email + password)
+Route::prefix('v1/auth')->group(function () {
+    Route::post('/login', [\App\Http\Controllers\Api\V1\UnifiedAuthController::class, 'login']);
+});
+
 Route::prefix('v1/customer')->group(function () {
     Route::post('/send-otp', [CustomerAuthController::class, 'sendOtp']);       // STEP 1
     Route::post('/verify-otp', [CustomerAuthController::class, 'verifyOtp']);   // STEP 2
@@ -50,8 +55,9 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 });
 
 Route::prefix('v1/technician')->group(function () {
-    Route::post('/send-otp', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'sendOtp']);    // STEP 1
-    Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'verifyOtp']); // STEP 2
+    // @deprecated — use POST /api/v1/auth/login instead
+    Route::post('/send-otp', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'sendOtp']);
+    Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'verifyOtp']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'logout']);
@@ -91,6 +97,7 @@ Route::prefix('v1/delivery')->group(function () {
 });
 
 Route::prefix('v1/admin')->group(function () {
+    // @deprecated — use POST /api/v1/auth/login instead
     Route::post('/login', [\App\Http\Controllers\Api\V1\Admin\AdminAuthController::class, 'login']);
 
     Route::middleware('auth:sanctum')->group(function () {
