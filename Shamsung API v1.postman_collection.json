@@ -3298,7 +3298,8 @@
                       "type": "text"
                     }
                   ]
-                }
+                },
+                "description": "Create a new consultation.\n\nSide effect: when consultation_type is \"technician\", this creates a DB notification record (notifications table, type=new_consultation) for every active technician, and sends an FCM push to technicians who have fcm_token set. No notification is created for consultation_type=\"ai\" (AI handles it directly)."
               },
               "response": [
                 {
