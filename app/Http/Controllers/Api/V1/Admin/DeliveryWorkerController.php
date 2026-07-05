@@ -10,14 +10,18 @@ use App\Http\Requests\Api\V1\Admin\UpdateDeliveryWorkerRequest;
 use App\Models\DeliveryWorker;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DeliveryWorkerController extends Controller
 {
     public function __construct(private readonly FcmService $fcm) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $workers = DeliveryWorker::with('shop:id,name')->latest()->paginate(15);
+        $workers = DeliveryWorker::with('shop:id,name')
+            ->when($request->filled('shop_id'), fn ($q) => $q->where('shop_id', $request->query('shop_id')))
+            ->latest()
+            ->paginate(15);
 
         return response()->json([
             'message' => 'Delivery workers retrieved successfully',

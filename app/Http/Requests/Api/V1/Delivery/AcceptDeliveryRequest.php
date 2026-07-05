@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Api\V1\Otp;
+namespace App\Http\Requests\Api\V1\Delivery;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class VerifyOtpRequest extends FormRequest
+class AcceptDeliveryRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,8 +16,7 @@ class VerifyOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => ['required', 'string', 'regex:/^\+963[0-9]{9}$/'],
-            'code'  => ['required', 'string', 'size:5'],
+            'estimated_time' => ['required', 'date'],
         ];
     }
 }

@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<style>
+* { font-family: 'dejavusans', sans-serif; }
+body { direction: rtl; font-size: 10pt; color: #1a1a1a; line-height: 1.6; }
+h1 { font-size: 20pt; color: #1e3a5f; border-bottom: 3px solid #1e3a5f; padding-bottom: 6px; margin-top: 18px; }
+h2 { font-size: 14pt; color: #2563ab; border-bottom: 2px solid #2563ab; padding-bottom: 4px; margin-top: 14px; background: #f0f6ff; padding: 5px 10px; }
+h3 { font-size: 11pt; color: #1e3a5f; margin-top: 12px; border-right: 4px solid #2563ab; padding-right: 8px; }
+h4 { font-size: 10pt; color: #374151; margin-top: 8px; }
+p  { margin: 4px 0; font-size: 10pt; }
+ul, ol { margin: 4px 0 4px 0; padding-right: 20px; }
+li { margin: 2px 0; }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 9pt; }
+th { background: #1e3a5f; color: #fff; padding: 6px 8px; text-align: right; }
+td { padding: 5px 8px; border: 1px solid #d1d5db; vertical-align: top; }
+tr:nth-child(even) td { background: #f8fafc; }
+.code { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 8px; font-size: 8pt; direction: ltr; text-align: left; border-radius: 4px; margin: 6px 0; white-space: pre; font-family: 'Courier New', Courier, monospace; overflow-x: auto; }
+.section-box { border: 1px solid #e2e8f0; border-radius: 4px; padding: 8px 12px; margin: 6px 0; background: #fafafa; }
+.cover { text-align: center; padding: 50px 20px; }
+.cover h1 { font-size: 26pt; border: none; color: #1e3a5f; }
+.cover h2 { font-size: 14pt; border: none; background: none; color: #64748b; }
+.toc-item { padding: 3px 0; border-bottom: 1px dotted #cbd5e1; }
+.m-get    { background:#d1fae5; color:#065f46; padding:2px 5px; border-radius:3px; font-size:8pt; font-weight:bold; }
+.m-post   { background:#dbeafe; color:#1e40af; padding:2px 5px; border-radius:3px; font-size:8pt; font-weight:bold; }
+.m-put    { background:#fef9c3; color:#854d0e; padding:2px 5px; border-radius:3px; font-size:8pt; font-weight:bold; }
+.m-delete { background:#fee2e2; color:#991b1b; padding:2px 5px; border-radius:3px; font-size:8pt; font-weight:bold; }
+.page-break { page-break-after: always; }
+.info-box { background:#eff6ff; border-right:4px solid #2563ab; padding:7px 11px; margin:7px 0; }
+.warn-box { background:#fff7ed; border-right:4px solid #ea580c; padding:7px 11px; margin:7px 0; }
+.green { background:#d1fae5; color:#065f46; padding:2px 7px; border-radius:10px; font-size:8pt; font-weight:bold; }
+.blue  { background:#dbeafe; color:#1e40af; padding:2px 7px; border-radius:10px; font-size:8pt; font-weight:bold; }
+.red   { background:#fee2e2; color:#991b1b; padding:2px 7px; border-radius:10px; font-size:8pt; font-weight:bold; }
+.yellow{ background:#fef9c3; color:#854d0e; padding:2px 7px; border-radius:10px; font-size:8pt; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<!-- غلاف -->
+<div class="cover">
+<br><br>
+<h1>مشروع شامسونج</h1>
+<h2>توثيق شامل للباك إند — Laravel 12 REST API</h2>
+<br>
+<table style="width:65%;margin:auto;border:2px solid #1e3a5f;">
+<tr><th>الإصدار</th><td>1.0.0</td></tr>
+<tr><th>المنصة</th><td>Laravel 12 / PHP 8.2+</td></tr>
+<tr><th>قاعدة البيانات</th><td>MySQL</td></tr>
+<tr><th>المصادقة</th><td>Laravel Sanctum</td></tr>
+<tr><th>رابط الإنتاج</th><td>https://shamsung.haderin.sy/api/v1</td></tr>
+</table>
+</div>
+
+<div class="page-break"></div>
+
+<!-- فهرس -->
+<h1>فهرس المحتويات</h1>
+<div class="section-box">
+<div class="toc-item"><a href="#sec-1">1. نظرة عامة على المشروع والتقنيات</a></div>
+<div class="toc-item"><a href="#sec-2">2. المتطلبات الوظيفية وغير الوظيفية</a></div>
+<div class="toc-item"><a href="#sec-3">3. هيكل المجلدات</a></div>
+<div class="toc-item"><a href="#sec-4">4. نظام المصادقة - الأدوار الأربعة</a></div>
+<div class="toc-item"><a href="#sec-5">5. النماذج (Models) - 18 نموذج</a></div>
+<div class="toc-item"><a href="#sec-6">6. الخدمات (Services) - OtpService / FcmService / ShopService</a></div>
+<div class="toc-item"><a href="#sec-7">7. المتحكمات (Controllers) - شرح كل دالة وأهم أسطرها</a></div>
+<div class="toc-item"><a href="#sec-8">8. جدول كل الـ Routes (75+ endpoint)</a></div>
+<div class="toc-item"><a href="#sec-9">9. Form Requests - قواعد التحقق</a></div>
+<div class="toc-item"><a href="#sec-10">10. آلة حالات طلب الصيانة والتوصيل</a></div>
+<div class="toc-item"><a href="#sec-11">11. نظام الإشعارات - FCM + قاعدة البيانات</a></div>
+<div class="toc-item"><a href="#sec-12">12. جداول قاعدة البيانات (Migrations)</a></div>
+<div class="toc-item"><a href="#sec-13">13. اتفاقية الاستجابات وأكواد HTTP</a></div>
+<div class="toc-item"><a href="#sec-14">14. الأمان والحماية (Security)</a></div>
+<div class="toc-item"><a href="#sec-15">15. القيود المعروفة والتحديات التقنية</a></div>
+<div class="toc-item"><a href="#sec-16">16. حسابات الاختبار والأوامر</a></div>
+<div class="toc-item"><a href="#sec-17">17. أسئلة المناقشة المتوقعة (Viva) وإجاباتها</a></div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 1. نظرة عامة -->
+<h1 id="sec-1">1. نظرة عامة على المشروع</h1>
+<p>مشروع شامسونج هو <strong>REST API</strong> مبني بـ <strong>Laravel 12</strong>، يخدم تطبيقات الجوال (iOS/Android) ولوحة تحكم React. لا توجد أي Blade views - كل التواصل يتم عبر JSON.</p>
+
+<div class="info-box">
+<strong>Base URL للإنتاج:</strong> https://shamsung.haderin.sy/api/v1<br>
+<strong>Base URL المحلي:</strong> http://127.0.0.1:8000/api/v1
+</div>
+
+<h3>الأدوار الأربعة في النظام</h3>
+<table>
+<tr><th>الدور</th><th>النموذج</th><th>طريقة الدخول</th><th>بادئة الـ Routes</th></tr>
+<tr><td>العميل (Customer)</td><td>App\Models\Customer</td><td>OTP عبر SMS</td><td>/api/v1/customer</td></tr>
+<tr><td>الفني (Technician)</td><td>App\Models\Technician</td><td>Email + Password (من لوحة التحكم)</td><td>/api/v1/auth/login</td></tr>
+<tr><td>عامل التوصيل (DeliveryWorker)</td><td>App\Models\DeliveryWorker</td><td>OTP عبر SMS</td><td>/api/v1/delivery</td></tr>
+<tr><td>المدير (Admin)</td><td>App\Models\Admin</td><td>Email + Password</td><td>/api/v1/admin</td></tr>
+</table>
+
+<h3>التقنيات المستخدمة</h3>
+<table>
+<tr><th>التقنية</th><th>الاستخدام</th></tr>
+<tr><td>Laravel Sanctum</td><td>إصدار API tokens للمصادقة - كل دور له token خاص</td></tr>
+<tr><td>Firebase FCM HTTP v1</td><td>إشعارات Push للجوال - بدون package خارجي</td></tr>
+<tr><td>Google Gemini AI</td><td>الاستشارات الذكية (gemini-2.5-flash-lite ثم gemini-flash-latest)</td></tr>
+<tr><td>Traccar SMS API</td><td>إرسال رسائل OTP عبر SMS</td></tr>
+<tr><td>MySQL</td><td>قاعدة البيانات الرئيسية</td></tr>
+<tr><td>Laravel Pint</td><td>تنسيق الكود تلقائياً (./vendor/bin/pint)</td></tr>
+<tr><td>PHP OpenSSL</td><td>بناء JWT يدوياً للتواصل مع Firebase</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- 2. المتطلبات -->
+<h1 id="sec-2">2. المتطلبات الوظيفية وغير الوظيفية</h1>
+
+<h2>2.1 المتطلبات الوظيفية (Functional Requirements) - ملخص</h2>
+<div class="section-box">
+<p>هذه الوظائف مبنية فعلياً في الكود (وليست افتراضات) - كل سطر هنا له Controller وForm Request وRoute مقابل:</p>
+<ul>
+<li><strong>FR-1..2:</strong> تسجيل/دخول العميل عبر OTP (3 خطوات) - <em>CustomerAuthController</em></li>
+<li><strong>FR-3..9:</strong> تقديم طلب صيانة، عرض القائمة والتفاصيل، الإلغاء، الموافقة/الرفض على التشخيص - <em>MaintenanceRequestController</em></li>
+<li><strong>FR-10..11:</strong> تشخيص الفني (تحديد القطع والوقت) وموافقة العميل مع خصم المخزون - <em>Technician\MaintenanceRequestController + MaintenanceRequestController::approve</em></li>
+<li><strong>FR-16..20:</strong> تصفح الملحقات، السلة، الدفع (checkout) مجزأ حسب الصالة - <em>AccessoryController / CartController / OrderController</em></li>
+<li><strong>FR-21:</strong> سجل الطلبيات للعميل - <em>OrderController::index</em></li>
+<li><strong>FR-22..23:</strong> استشارات AI (Gemini) واستشارات فنية بشرية - <em>Customer\ConsultationController</em></li>
+<li><strong>FR-25:</strong> إيجاد أقرب صالة بالإحداثيات (Haversine) - <em>ShopService</em></li>
+<li><strong>FR-28:</strong> إدارة الصالات من الأدمن (CRUD + صورة + تقييم + تفعيل/تعطيل) - <em>Admin\ShopController</em></li>
+<li><strong>FR-29..30:</strong> إدارة المخزون وطلبات التزويد - <em>Admin\SparePartController</em></li>
+<li><strong>FR-31:</strong> إدارة الملحقات - <em>Admin\AccessoryController</em></li>
+<li>إدارة الفنيين وعمال التوصيل (بدون كلمة مرور - OTP فقط للدخول من الجوال، أو Email/Password من لوحة الفني)</li>
+<li>تدفق التوصيل الكامل: قبول → في الطريق → وصل → تأكيد + تحصيل كاش</li>
+<li>نظام إشعارات مزدوج: Push (FCM) + إشعارات داخل التطبيق (قاعدة بيانات) لكل الأدوار الأربعة</li>
+<li>حظر المتاجر (is_active=false) يمنع الطلبات الجديدة عليها فوراً من كل الواجهات</li>
+</ul>
+</div>
+
+<h2>2.2 المتطلبات غير الوظيفية (Non-Functional Requirements)</h2>
+
+<h3>2.2.1 الأداء (Performance)</h3>
+<div class="section-box">
+<ul>
+<li>كل قوائم البيانات (Maintenance Requests, Orders, Deliveries, Shops, Technicians...) تستخدم <strong>Pagination</strong> (15 عنصر/صفحة) بدل جلب كل الجدول - يمنع استهلاك ذاكرة عالٍ مع نمو البيانات.</li>
+<li>استخدام <strong>Eager Loading</strong> (<code>with('customer', 'shop', 'parts')</code>) في كل مكان لتفادي مشكلة N+1 queries.</li>
+<li>حساب المسافة الجغرافية (Haversine) يتم <strong>داخل استعلام SQL واحد</strong> (selectRaw) بدل جلب كل الصالات وحسابها في PHP - أسرع وأقل استهلاك ذاكرة.</li>
+<li>FCM Access Token يُخزَّن في Cache لمدة 55 دقيقة بدل طلب token جديد من Google في كل إشعار - يوفر round-trip كامل لكل إشعار.</li>
+<li><strong>نقطة ضعف حالية:</strong> لا يوجد Queue فعلي لإرسال الإشعارات (FCM يُرسَل بشكل متزامن Synchronous ضمن نفس الـ request) - لو تأخرت استجابة Google/Firebase سيتأخر رد الـ API معها. الحل المستقبلي: تفعيل <code>QUEUE_CONNECTION=database</code> فعلياً مع Jobs بدل الاستدعاء المباشر.</li>
+</ul>
+</div>
+
+<h3>2.2.2 الأمان (Security)</h3>
+<div class="section-box">
+<p>تفصيل كامل في <a href="#sec-14">القسم 14</a>. ملخص سريع: Sanctum tokens منفصلة لكل دور، تشفير كلمات المرور bcrypt، Rate Limiting على OTP، لا secrets في الكود (كلها في .env)، Form Requests تتحقق من كل مدخل قبل وصوله لقاعدة البيانات.</p>
+</div>
+
+<h3>2.2.3 قابلية التوسع (Scalability)</h3>
+<div class="section-box">
+<ul>
+<li>المعمارية Stateless بالكامل (REST + Token-based auth) - يمكن تشغيل عدة نسخ من السيرفر خلف Load Balancer بدون مشاكل جلسات (لا يوجد اعتماد على PHP Session للـ API نفسه).</li>
+<li>فصل واضح بين الأدوار الأربعة (Guards منفصلة) يسمح مستقبلاً بفصل كل دور في microservice مستقل لو لزم الأمر بدون إعادة هيكلة جذرية.</li>
+<li>نقطة اختناق محتملة: قاعدة بيانات MySQL واحدة بدون Read Replicas - مقبول لحجم المشروع الحالي (مشروع تخرج/شركة ناشئة) لكن يحتاج مراجعة لو زاد عدد الصالات لعشرات الآلاف من الطلبات يومياً.</li>
+</ul>
+</div>
+
+<h3>2.2.4 الموثوقية والتوفر (Reliability &amp; Availability)</h3>
+<div class="section-box">
+<ul>
+<li>كل عملية تُغيّر عدة جداول مرتبطة (checkout، الموافقة على التشخيص) مغلّفة بـ <code>DB::transaction()</code> - إما تنجح كل الخطوات أو تتراجع كلها، فلا توجد بيانات نصف-محدَّثة.</li>
+<li>إرسال FCM محاط بـ <code>try/catch</code> في كل مكان - فشل الإشعار لا يوقف نجاح العملية الأساسية أبداً (مبدأ "fire-and-forget").</li>
+<li><strong>قيد خارجي مكتشف فعلياً في هذا المشروع:</strong> استضافة مشتركة سورية + حظر جغرافي من Google لخدمة Gemini AI (راجع <a href="#sec-15">القسم 15</a>) - مثال حي على أن التوفر لا يعتمد فقط على الكود بل على القيود الجغرافية/السياسية للخدمات الخارجية المستخدمة.</li>
+</ul>
+</div>
+
+<h3>2.2.5 قابلية الصيانة (Maintainability)</h3>
+<div class="section-box">
+<ul>
+<li>كل Endpoint له Form Request مستقل لقواعد التحقق - الكونترولر لا يحتوي منطق تحقق مباشر (Separation of Concerns).</li>
+<li>تسمية موحدة للاستجابات: <code>{ "message": "...", "data": {...} }</code> في كل مكان - يسهّل على فريق الموبايل بناء طبقة استدعاء API عامة (Generic API client).</li>
+<li>الحالات النشطة لطلب الصيانة موحّدة في ثابت واحد <code>MaintenanceRequest::ACTIVE_STATUSES</code> ويُستخدم في أكثر من كونترولر (حالة توفر الصالة، حالة انشغال الفني) بدل تكرار المصفوفة في كل مكان.</li>
+</ul>
+</div>
+
+<h3>2.2.6 قابلية الاستخدام (Usability)</h3>
+<div class="section-box">
+<ul>
+<li>رسائل الأخطاء بصيغة JSON منظمة وواضحة (422 يرجع <code>errors</code> لكل حقل بشكل منفصل) - تسهّل على الموبايل عرض رسالة مناسبة لكل حقل.</li>
+<li>حالتان منفصلتان لطلب الصيانة (<code>status</code> للفني/النظام، <code>customer_status</code> للعميل) - تفصل بين "أين الطلب تقنياً" و"ماذا يجب أن يرى العميل" لتفادي حالات فنية معقدة تظهر للمستخدم النهائي.</li>
+</ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 3. هيكل المجلدات -->
+<h1 id="sec-3">3. هيكل المجلدات</h1>
+<div class="code">app/
+├── Http/Controllers/
+│   └── Api/V1/
+│       ├── CustomerAuthController.php     ← تسجيل/دخول العملاء بـ OTP (3 خطوات)
+│       ├── TechnicianAuthController.php   ← دخول الفنيين بـ OTP (خطوتان)
+│       ├── DeliveryAuthController.php     ← دخول عمال التوصيل بـ OTP
+│       ├── UnifiedAuthController.php      ← دخول Admin+Technician بـ email/password
+│       ├── MaintenanceRequestController   ← طلبات الصيانة (العميل)
+│       ├── ShopController.php             ← إيجاد أقرب صالة (Haversine)
+│       ├── AccessoryController.php        ← تصفح الملحقات
+│       ├── CartController.php             ← السلة
+│       ├── OrderController.php            ← الدفع والطلبيات
+│       ├── Admin/
+│       │   ├── AdminAuthController.php
+│       │   ├── AdminDashboardController.php
+│       │   ├── AdminMaintenanceRequestController.php
+│       │   ├── AdminOrderController.php
+│       │   ├── AdminDeliveryController.php
+│       │   ├── AdminNotificationController.php
+│       │   ├── ShopController.php         ← CRUD الصالات + صور
+│       │   ├── TechnicianController.php   ← CRUD الفنيين
+│       │   ├── SparePartController.php    ← قطع الغيار + المخزون
+│       │   ├── AccessoryController.php    ← CRUD الملحقات + صور
+│       │   └── DeliveryWorkerController.php
+│       ├── Technician/
+│       │   ├── MaintenanceRequestController.php ← فحص + تشخيص
+│       │   ├── SparePartController.php    ← قطع صالته فقط
+│       │   ├── ConsultationController.php ← رد على استشارات
+│       │   └── NotificationController.php
+│       ├── Customer/
+│       │   ├── ConsultationController.php ← AI أو فني
+│       │   ├── DeliveryController.php     ← تتبع التوصيلات
+│       │   └── NotificationController.php ← إشعارات العميل (جديد)
+│       └── Delivery/
+│           └── DeliveryController.php     ← إدارة التوصيل
+├── Http/Requests/Api/V1/                  ← Form Requests للتحقق
+│   └── Delivery/AcceptDeliveryRequest.php ← يفرض estimated_time عند قبول التوصيلة (جديد)
+├── Models/                                ← 18 نموذج
+└── Services/
+    ├── OtpService.php                     ← إرسال/تحقق OTP + Rate Limiting
+    ├── FcmService.php                     ← إشعارات Firebase (JWT يدوي)
+    └── ShopService.php                    ← البحث الجغرافي Haversine
+
+جذر المشروع/
+└── gemini-proxy-worker.js  ← كود Cloudflare Worker: بروكسي خارجي لتفادي حظر Gemini الجغرافي عن سوريا (راجع القسم 15)
+
+routes/
+├── api.php    ← كل الـ API routes (75+ endpoint)
+└── web.php    ← الـ default route فقط
+
+storage/app/public/
+├── shops/          ← صور الصالات
+├── accessories/    ← صور الملحقات
+└── consultations/  ← صور الاستشارات
+
+storage/app/
+└── firebase-credentials.json  ← مفاتيح FCM (service account)</div>
+
+<div class="page-break"></div>
+
+<!-- 4. المصادقة -->
+<h1 id="sec-4">4. نظام المصادقة</h1>
+
+<h2>4.1 دخول العملاء - OTP بثلاث خطوات</h2>
+<div class="section-box">
+<p><strong>الخطوة 1 - طلب OTP:</strong></p>
+<div class="code">POST /api/v1/customer/send-otp
+Body: { "phone": "+963912345678" }
+Response 200: { "message": "OTP sent successfully" }
+Response 429: { "message": "Too many attempts..." }  ← أكثر من 3 في 60 ثانية</div>
+
+<p><strong>الخطوة 2 - التحقق:</strong></p>
+<div class="code">POST /api/v1/customer/verify-otp
+Body: { "phone": "+963912345678", "code": "12345" }
+
+مستخدم جديد  → 200: { "data": { "is_new_user": true, "phone": "..." } }
+مستخدم موجود → 200: { "data": { "customer": {...}, "token": "1|abc..." } }
+كود خاطئ     → 422: { "message": "Invalid or expired OTP." }</div>
+
+<p><strong>الخطوة 3 - تسجيل (للجدد فقط):</strong></p>
+<div class="code">POST /api/v1/customer/register
+Body: { "first_name":"أحمد", "last_name":"محمد", "phone":"+963912345678",
+        "email":"a@a.com", "birthdate":"1995-01-15" }
+Response 201: { "data": { "customer": {...}, "token": "2|xyz..." } }
+⚠ يتحقق من وجود OTP بـ phone_verified=true خلال 10 دقائق</div>
+</div>
+
+<h2>4.2 دخول الفنيين - Email + Password (مثل الأدمن)</h2>
+<div class="section-box">
+<div class="info-box">الفني يدخل من <strong>نفس لوحة التحكم</strong> باستخدام Email + Password. يُنشأ حسابه من الأدمن ولا علاقة له بـ OTP.</div>
+<div class="code">POST /api/v1/auth/login
+Body: { "email": "tech@shamsung.com", "password": "password123" }
+
+نجاح (فني)   → 200: { "data": { "role": "technician", "user": {..., "shop":{...}}, "token":"..." } }
+نجاح (أدمن)  → 200: { "data": { "role": "admin",      "user": {...},               "token":"..." } }
+بيانات خاطئة → 401: { "message": "Invalid credentials." }
+حساب موقوف   → 403: { "message": "Your account has been deactivated." }
+
+⚠ يبحث في جدول admins أولاً، فإن لم يجد يبحث في technicians</div>
+<p><strong>UnifiedAuthController:</strong> هو المتحكم المسؤول - يخدم الأدمن والفني معاً من نفس الـ endpoint.</p>
+</div>
+
+<h2>4.3 دخول عمال التوصيل - OTP بخطوتين</h2>
+<div class="code">POST /api/v1/delivery/send-otp
+POST /api/v1/delivery/verify-otp
+← نفس منطق الفني تماماً</div>
+
+<h2>4.4 دخول الأدمن - Email/Password</h2>
+<div class="section-box">
+<div class="code">POST /api/v1/auth/login
+Body: { "email": "admin@shamsung.com", "password": "password123" }
+Response: { "data": { "role": "admin", "user": {...}, "token": "..." } }
+
+← نفس الـ endpoint للفني الذي لديه email/password:
+Response: { "data": { "role": "technician", "user": {..., "shop":{...}}, "token":"..." } }
+
+يبحث في admins أولاً، ثم technicians
+إذا لم يجد: 401 Invalid credentials</div>
+</div>
+
+<h2>4.5 استخدام الـ Token في كل request محمي</h2>
+<div class="code">Authorization: Bearer {token}
+Accept: application/json</div>
+<div class="warn-box">الـ Tokens لا تنتهي تلقائياً (expiration=null). تُحذف فقط عند logout أو عند استدعاء tokens()->delete().</div>
+
+<h2>4.6 أهم أسطر الكود في منطق المصادقة</h2>
+
+<h3>UnifiedAuthController::login() - المسؤول عن Admin + Technician معاً</h3>
+<div class="section-box">
+<div class="code">$admin = Admin::where('email', $email)->first();
+if ($admin &amp;&amp; Hash::check($password, $admin->password)) {
+    $token = $admin->createToken('admin_token')->plainTextToken;
+    return response()->json(['data' => ['role' => 'admin', 'user' => $admin, 'token' => $token]]);
+}
+
+$technician = Technician::where('email', $email)->first();
+if ($technician &amp;&amp; Hash::check($password, $technician->password)) {
+    if (! $technician->is_active) {
+        return response()->json(['message' => 'Your account has been deactivated.'], 403);
+    }
+    $token = $technician->createToken('technician_token')->plainTextToken;
+    return response()->json(['data' => ['role' => 'technician', 'user' => $technician->load('shop'), 'token' => $token]]);
+}
+
+return response()->json(['message' => 'Invalid credentials.'], 401);</div>
+<p><strong>لماذا مهم:</strong> نفس الـ endpoint (<code>/auth/login</code>) يخدم دورين مختلفين - القرار يُتَّخذ بناءً على أي جدول يحتوي الإيميل، وليس بناءً على حقل "role" يرسله المستخدم (لتفادي انتحال الشخصية بإرسال role خاطئ).</p>
+</div>
+
+<h3>OtpService::sendOtp() - Rate Limiting الفعلي</h3>
+<div class="section-box">
+<div class="code">$key = 'otp-send:' . $phone;
+if (RateLimiter::tooManyAttempts($key, maxAttempts: 3)) {
+    return false; // Controller يرجعها 429
+}
+RateLimiter::hit($key, decaySeconds: 60);
+
+$code = (string) random_int(10000, 99999);
+Otp::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(10)]);</div>
+<p><strong>لماذا مهم:</strong> الـ Rate Limiter مبني على مفتاح <em>لكل رقم هاتف</em> (ليس IP)، فمنع الإساءة يبقى فعّالاً حتى لو المهاجم غيّر الشبكة/IP باستمرار. الـ key بالكامل يعتمد على cache driver الافتراضي (database هنا حسب .env: CACHE_STORE=database).</p>
+</div>
+
+<h3>OtpService::verifyOtp() - التمييز بين مستخدم جديد وموجود</h3>
+<div class="section-box">
+<div class="code">$otp = Otp::where('phone', $phone)->where('code', $code)
+    ->where('is_used', false)->where('expires_at', '>', now())->latest()->first();
+
+if (! $otp) return 'otp_invalid_or_expired';
+
+$otp->update(['is_used' => true]);
+$user = $this->findByPhone($phone, $guard);
+
+if (! $user) {
+    $otp->update(['phone_verified' => true]); // يسمح بـ register خلال 10 دقائق
+    return 'user_not_found';
+}
+if (isset($user->is_active) &amp;&amp; ! $user->is_active) {
+    return 'account_deactivated';
+}
+return ['token' => $user->createToken("{$guard}_token")->plainTextToken, 'user' => $user];</div>
+<p><strong>ملاحظة أمان:</strong> الـ OTP يُعلَّم <code>is_used=true</code> فوراً بعد أول تحقق ناجح - لا يمكن إعادة استخدامه، حتى لو حاول أحد إعادة إرسال نفس الطلب (replay attack).</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 5. النماذج -->
+<h1 id="sec-5">5. النماذج (Models)</h1>
+
+<h2>5.1 Customer - العميل</h2>
+<p><strong>الجدول:</strong> customers | <strong>Traits:</strong> HasApiTokens, Notifiable</p>
+<table>
+<tr><th>الحقل</th><th>النوع</th><th>الوصف</th></tr>
+<tr><td>id</td><td>bigint PK</td><td>المعرف التلقائي</td></tr>
+<tr><td>first_name</td><td>string</td><td>الاسم الأول</td></tr>
+<tr><td>last_name</td><td>string</td><td>الاسم الأخير</td></tr>
+<tr><td>email</td><td>string unique nullable</td><td>البريد الإلكتروني (اختياري)</td></tr>
+<tr><td>password</td><td>string nullable hashed</td><td>مشفر bcrypt تلقائياً</td></tr>
+<tr><td>phone</td><td>string unique</td><td>رقم الهاتف بصيغة +963XXXXXXXXX</td></tr>
+<tr><td>birthdate</td><td>date nullable</td><td>تاريخ الميلاد</td></tr>
+<tr><td>fcm_token</td><td>string nullable</td><td>رمز Firebase للإشعارات</td></tr>
+</table>
+<p><strong>العلاقات:</strong> hasMany(MaintenanceRequest) | hasMany(CartItem) | hasMany(Order)</p>
+
+<h2>5.2 Technician - الفني</h2>
+<p><strong>الجدول:</strong> technicians | <strong>Traits:</strong> HasApiTokens, Notifiable</p>
+<table>
+<tr><th>الحقل</th><th>النوع</th><th>الوصف</th></tr>
+<tr><td>shop_id</td><td>bigint FK nullable</td><td>الصالة التابع لها</td></tr>
+<tr><td>first_name / last_name</td><td>string</td><td>الاسم</td></tr>
+<tr><td>email</td><td>string unique nullable</td><td>البريد (اختياري)</td></tr>
+<tr><td>phone</td><td>string unique</td><td>+963XXXXXXXXX</td></tr>
+<tr><td>password</td><td>string nullable hashed</td><td>للدخول بـ email/password</td></tr>
+<tr><td>specialization</td><td>string</td><td>التخصص</td></tr>
+<tr><td>experience</td><td>string</td><td>سنوات الخبرة</td></tr>
+<tr><td>is_active</td><td>boolean default:true</td><td>هل الحساب نشط</td></tr>
+<tr><td>fcm_token</td><td>string nullable</td><td>رمز Firebase</td></tr>
+</table>
+<p><strong>العلاقات:</strong> belongsTo(Shop)</p>
+
+<h2>5.3 DeliveryWorker - عامل التوصيل</h2>
+<p><strong>الجدول:</strong> delivery_workers | <strong>Traits:</strong> HasApiTokens, Notifiable</p>
+<p>نفس حقول Technician تماماً (shop_id, first_name, last_name, email, phone, password nullable, specialization, experience, is_active, fcm_token, birthdate)</p>
+<p><strong>العلاقات:</strong> belongsTo(Shop) | hasMany(Delivery)</p>
+
+<h2>5.4 Admin - المدير</h2>
+<p><strong>الجدول:</strong> admins | <strong>Traits:</strong> HasApiTokens</p>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>name</td><td>الاسم</td></tr>
+<tr><td>email unique</td><td>البريد الإلكتروني</td></tr>
+<tr><td>password hashed</td><td>مشفر bcrypt</td></tr>
+<tr><td>fcm_token nullable</td><td>رمز Firebase</td></tr>
+</table>
+
+<h2>5.5 Shop - الصالة</h2>
+<p><strong>الجدول:</strong> shops</p>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>name / address / phone</td><td>معلومات أساسية</td></tr>
+<tr><td>image_path nullable</td><td>مسار صورة الصالة في storage</td></tr>
+<tr><td>rating decimal(3,2)</td><td>التقييم مثلاً: 4.75</td></tr>
+<tr><td>latitude / longitude float</td><td>الإحداثيات الجغرافية</td></tr>
+<tr><td>is_active boolean</td><td>هل الصالة نشطة ومرئية</td></tr>
+</table>
+<p><strong>العلاقات:</strong> hasMany(MaintenanceRequest) | hasMany(Technician) | hasMany(SparePart)</p>
+
+<h2>5.6 MaintenanceRequest - طلب الصيانة</h2>
+<p><strong>الجدول:</strong> maintenance_requests</p>
+<div class="info-box">سلوك تلقائي (boot): عند إنشاء أي طلب يُولَّد tracking_number بصيغة <strong>SHM-XXXXXXXX</strong> (8 أحرف عشوائية كبيرة)</div>
+<table>
+<tr><th>الحقل</th><th>النوع</th><th>الوصف</th></tr>
+<tr><td>tracking_number</td><td>string unique</td><td>SHM-XXXXXXXX - رقم التتبع</td></tr>
+<tr><td>customer_id FK</td><td>bigint</td><td>العميل صاحب الطلب</td></tr>
+<tr><td>shop_id FK</td><td>bigint</td><td>الصالة المستقبِلة</td></tr>
+<tr><td>device_model</td><td>string</td><td>موديل الجهاز</td></tr>
+<tr><td>problem_description</td><td>text</td><td>وصف المشكلة</td></tr>
+<tr><td>status</td><td>string</td><td>pending | under_inspection | waiting_customer_approval | approved | completed | cancelled</td></tr>
+<tr><td>customer_status</td><td>string nullable</td><td>pending_approval | approved | rejected</td></tr>
+<tr><td>rejection_reason</td><td>string nullable</td><td>سبب رفض العميل للتشخيص</td></tr>
+<tr><td>payment_method</td><td>string nullable</td><td>cash_on_delivery | pay_after_service</td></tr>
+<tr><td>estimated_cost</td><td>decimal nullable</td><td>التكلفة التقديرية - تُحسب عند الموافقة</td></tr>
+<tr><td>estimated_days</td><td>integer nullable</td><td>أيام الإصلاح التقديرية</td></tr>
+</table>
+<p><strong>العلاقات:</strong> belongsTo(Customer) | belongsTo(Shop) | hasMany(MaintenanceRequestPart)</p>
+
+<h2>5.7 MaintenanceRequestPart - قطع الطلب</h2>
+<p><strong>الجدول:</strong> maintenance_request_parts</p>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>maintenance_request_id FK</td><td>الطلب المرتبط</td></tr>
+<tr><td>spare_part_id FK nullable</td><td>القطعة الأصلية من الكتالوج</td></tr>
+<tr><td>name</td><td>اسم القطعة - منسوخ من SparePart عند التشخيص</td></tr>
+<tr><td>price</td><td>السعر - منسوخ من SparePart عند التشخيص (snapshot)</td></tr>
+<tr><td>quantity integer</td><td>الكمية</td></tr>
+<tr><td>is_required boolean</td><td>هل القطعة إلزامية للإصلاح</td></tr>
+<tr><td>is_selected boolean</td><td>هل اختارها العميل عند الموافقة</td></tr>
+</table>
+<p><strong>العلاقات:</strong> belongsTo(SparePart)</p>
+
+<h2>5.8 SparePart - قطع الغيار</h2>
+<p><strong>الجدول:</strong> spare_parts</p>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>shop_id FK</td><td>الصالة المالكة</td></tr>
+<tr><td>name</td><td>اسم القطعة</td></tr>
+<tr><td>price float</td><td>السعر</td></tr>
+<tr><td>stock_quantity integer</td><td>الكمية في المخزون - تنقص عند موافقة العميل على التشخيص</td></tr>
+</table>
+
+<h2>5.9 StockRequest - طلب تزويد المخزون</h2>
+<p><strong>الجدول:</strong> stock_requests</p>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>shop_id FK</td><td>الصالة الطالبة</td></tr>
+<tr><td>spare_part_id FK</td><td>القطعة المطلوبة</td></tr>
+<tr><td>quantity</td><td>الكمية المطلوبة</td></tr>
+<tr><td>status</td><td>pending | approved | rejected</td></tr>
+</table>
+<p>عند موافقة الأدمن: تُضاف الكمية مباشرة إلى spare_parts.stock_quantity</p>
+
+<h2>5.10 Accessory - الملحقات</h2>
+<p><strong>الجدول:</strong> accessories</p>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>shop_id FK</td><td>الصالة المالكة</td></tr>
+<tr><td>name / description</td><td>الاسم والوصف</td></tr>
+<tr><td>price float</td><td>السعر</td></tr>
+<tr><td>stock_quantity integer</td><td>الكمية - تنقص عند checkout</td></tr>
+<tr><td>image_url</td><td>رابط الصورة (مُنشأ من storage path)</td></tr>
+<tr><td>is_active boolean</td><td>هل المنتج متاح للعرض</td></tr>
+</table>
+
+<h2>5.11 Order - الطلبية</h2>
+<p><strong>الجدول:</strong> orders</p>
+<div class="info-box">سلوك تلقائي (boot): يُولَّد order_number بصيغة <strong>ORD-XXXXXXXX</strong> عند الإنشاء</div>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>order_number unique</td><td>ORD-XXXXXXXX</td></tr>
+<tr><td>customer_id FK</td><td>العميل</td></tr>
+<tr><td>shop_id FK</td><td>الصالة (طلبية واحدة لكل صالة)</td></tr>
+<tr><td>total_amount float</td><td>المبلغ الإجمالي</td></tr>
+<tr><td>payment_method</td><td>cash_on_delivery | pay_after_service</td></tr>
+<tr><td>status</td><td>pending | confirmed | delivered | cancelled</td></tr>
+</table>
+<p><strong>العلاقات:</strong> belongsTo(Customer) | belongsTo(Shop) | hasMany(OrderItem)</p>
+
+<h2>5.12 OrderItem - عنصر الطلبية</h2>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>order_id FK</td><td>الطلبية</td></tr>
+<tr><td>accessory_id FK</td><td>المنتج</td></tr>
+<tr><td>quantity</td><td>الكمية</td></tr>
+<tr><td>unit_price float</td><td>السعر وقت الشراء (snapshot ثابت)</td></tr>
+</table>
+
+<h2>5.13 CartItem - عنصر السلة</h2>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>customer_id FK</td><td>العميل</td></tr>
+<tr><td>accessory_id FK</td><td>المنتج</td></tr>
+<tr><td>quantity</td><td>الكمية - تتجمع إذا أضاف العميل نفس المنتج مرتين</td></tr>
+</table>
+
+<h2>5.14 Consultation - الاستشارة</h2>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>customer_id FK</td><td>العميل</td></tr>
+<tr><td>technician_id FK nullable</td><td>الفني (null إذا كانت استشارة AI)</td></tr>
+<tr><td>consultation_type</td><td>technician | ai</td></tr>
+<tr><td>message</td><td>رسالة العميل (أو null إذا أرسل صورة فقط)</td></tr>
+<tr><td>image_path nullable</td><td>مسار الصورة في storage/consultations</td></tr>
+<tr><td>reply</td><td>رد الفني أو AI</td></tr>
+<tr><td>status</td><td>pending | answered | ai_answered</td></tr>
+</table>
+
+<h2>5.15 Delivery - التوصيل</h2>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>type</td><td>device_pickup | device_dropoff | accessory_delivery</td></tr>
+<tr><td>delivery_worker_id FK nullable</td><td>العامل المُعيَّن (null حتى يقبل أحد)</td></tr>
+<tr><td>customer_id FK</td><td>العميل</td></tr>
+<tr><td>shop_id FK</td><td>الصالة</td></tr>
+<tr><td>maintenance_request_id FK nullable</td><td>طلب الصيانة المرتبط (إن وجد)</td></tr>
+<tr><td>order_id FK nullable</td><td>الطلبية المرتبطة (إن وجدت)</td></tr>
+<tr><td>status</td><td>pending | accepted | on_the_way | arrived | picked_up | in_transit | delivered | failed | rejected</td></tr>
+<tr><td>payment_method</td><td>cash_on_delivery | prepaid</td></tr>
+<tr><td>notes</td><td>ملاحظات</td></tr>
+<tr><td><strong>latitude / longitude decimal nullable</strong></td><td><strong>موقع العميل (عمود جديد) - يُنسَخ من الـ request وقت approve()/checkout() أو من الأدمن يدوياً</strong></td></tr>
+<tr><td><strong>address string nullable</strong></td><td><strong>عنوان نصي اختياري يرافق الإحداثيات (عمود جديد)</strong></td></tr>
+<tr><td>estimated_time timestamp nullable</td><td>وقت الوصول التقديري - <strong>يُحدَّده عامل التوصيل الآن عند القبول</strong> (كان الأدمن سابقاً)</td></tr>
+<tr><td>confirmation_code</td><td>كود التأكيد عند التسليم</td></tr>
+<tr><td>confirmation_image_path</td><td>صورة التأكيد</td></tr>
+<tr><td>confirmed_at timestamp</td><td>وقت التأكيد الفعلي</td></tr>
+<tr><td>cash_collected boolean</td><td>هل جُمع الكاش</td></tr>
+<tr><td>cash_amount decimal</td><td>المبلغ المحصَّل</td></tr>
+</table>
+
+<h2>5.16 Otp - رمز التحقق</h2>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>phone</td><td>رقم الهاتف</td></tr>
+<tr><td>code</td><td>5 أرقام عشوائية</td></tr>
+<tr><td>is_used boolean</td><td>هل استُخدم (يتحول true بعد التحقق)</td></tr>
+<tr><td>phone_verified boolean</td><td>هل الهاتف مُتحقَّق منه (للمستخدمين الجدد)</td></tr>
+<tr><td>expires_at datetime</td><td>وقت الانتهاء (now + 10 دقائق)</td></tr>
+</table>
+
+<h2>5.17 Notification - الإشعار</h2>
+<table>
+<tr><th>الحقل</th><th>الوصف</th></tr>
+<tr><td>admin_id FK nullable</td><td>الأدمن المستقبِل</td></tr>
+<tr><td>technician_id FK nullable</td><td>الفني المستقبِل</td></tr>
+<tr><td><strong>customer_id FK nullable</strong></td><td><strong>العميل المستقبِل (عمود جديد - قبله كان العميل بدون سجل إشعارات دائم)</strong></td></tr>
+<tr><td>type</td><td>نوع الإشعار كنص (maintenance_request / consultation / delivery / account_status / new_delivery / new_consultation ...)</td></tr>
+<tr><td>title / body</td><td>عنوان ونص الإشعار</td></tr>
+<tr><td>data JSON</td><td>بيانات إضافية (id, type)</td></tr>
+<tr><td>is_read boolean</td><td>هل قُرئ</td></tr>
+</table>
+<div class="info-box">صف واحد بالجدول = إشعار لمستلِم واحد بالضبط. في كل صف عمود واحد فقط من الثلاثة (admin_id/technician_id/customer_id) مملوء والباقي null - يعني الجدول مشترك بين الأدوار الثلاثة بدل ثلاثة جداول منفصلة (تصميم Polymorphic-lite بدون استخدام morphTo الفعلي من Eloquent).</div>
+
+<h2>5.18 User - المستخدم الافتراضي</h2>
+<div class="warn-box">هذا النموذج الافتراضي من Laravel ولا يُستخدم في هذا المشروع. الأدوار الأربعة لها نماذج منفصلة خاصة بها.</div>
+
+<div class="page-break"></div>
+
+<!-- 5. الخدمات -->
+<h1 id="sec-6">6. الخدمات (Services)</h1>
+
+<h2>6.1 OtpService</h2>
+<p><strong>الملف:</strong> app/Services/OtpService.php</p>
+
+<h3>sendOtp(string phone): bool</h3>
+<div class="section-box">
+<p><strong>الغرض:</strong> توليد وإرسال كود OTP للهاتف المحدد عبر SMS.</p>
+<ol>
+<li>يتحقق من Rate Limiting: إذا طُلب أكثر من <strong>3 رسائل في 60 ثانية</strong> لنفس الهاتف → يرجع false</li>
+<li>يسجّل محاولة: RateLimiter::hit(key, 60)</li>
+<li>يولّد كود: random_int(10000, 99999) - 5 أرقام</li>
+<li>يحفظ في جدول otps: { phone, code, is_used:false, expires_at: now+10min }</li>
+<li>يرسل عبر Traccar SMS API بـ cURL مع Authorization header</li>
+<li>يرجع true إذا كان HTTP status 2xx، false في حالة الخطأ</li>
+</ol>
+<p><strong>رسالة الـ SMS:</strong> "شامسونج: كود التحقق هو XXXXX"</p>
+<p><strong>API:</strong> POST https://www.traccar.org/sms/ - JSON body: { "to": phone, "message": "..." }</p>
+</div>
+
+<h3>verifyOtp(string phone, string code, string guard): array|string</h3>
+<div class="section-box">
+<p><strong>الغرض:</strong> التحقق من صحة الكود وتسجيل دخول المستخدم.</p>
+<table>
+<tr><th>القيمة المُرجَعة</th><th>المعنى</th><th>الـ HTTP Response</th></tr>
+<tr><td>'otp_invalid_or_expired'</td><td>الكود خاطئ أو منتهي الصلاحية</td><td>422</td></tr>
+<tr><td>'user_not_found'</td><td>هاتف غير مسجل - مستخدم جديد - يُعيَّن phone_verified=true</td><td>200 is_new_user</td></tr>
+<tr><td>'account_deactivated'</td><td>الحساب موقوف (فني أو عامل توصيل)</td><td>403</td></tr>
+<tr><td>['token'=>..., 'user'=>...]</td><td>نجاح - يرجع token وبيانات المستخدم</td><td>200</td></tr>
+</table>
+<p><strong>قيم guard:</strong> 'customer' | 'technician' | 'delivery'</p>
+<p><strong>findByPhone():</strong> يبحث في الجدول المناسب حسب guard (customers / technicians / delivery_workers)</p>
+</div>
+
+
+<h2>6.2 FcmService</h2>
+<p><strong>الملف:</strong> app/Services/FcmService.php</p>
+<p><strong>بيانات الاعتماد:</strong> storage/app/firebase-credentials.json (service account)</p>
+<p><strong>مشروع Firebase:</strong> shamsoung-d2d58</p>
+
+<div class="info-box">لا يوجد package خارجي. الكود يبني JWT بـ RS256 يدوياً باستخدام PHP OpenSSL ويستدعي FCM HTTP v1 API مباشرة.</div>
+
+<h3>send(string token, string title, string body, array data): void</h3>
+<p>إرسال إشعار Push لجهاز واحد. جميع FCM calls هي fire-and-forget (تُسجَّل الأخطاء ولا تُوقف الـ request).</p>
+
+<h3>sendMultiple(array tokens, string title, string body, array data): void</h3>
+<p>إرسال إشعار لعدة أجهزة. يُرسل لكل token على حدة في loop.</p>
+
+<h3>آلية العمل الداخلية</h3>
+<ol>
+<li><strong>getAccessToken():</strong> يتحقق من كاش 'fcm_access_token' - إذا موجود يرجعه مباشرة</li>
+<li><strong>fetchAccessToken():</strong> يبني JWT ويرسله لـ Google OAuth2 endpoint للحصول على access token جديد</li>
+<li><strong>buildJwt():</strong> يبني JWT بـ header(RS256) + payload(iss,scope,aud,iat,exp) + signature بالمفتاح الخاص</li>
+<li>يخزن الـ token في كاش لمدة <strong>55 دقيقة</strong> (FCM tokens تنتهي بعد 60 دقيقة)</li>
+</ol>
+
+<h3>بنية الـ data payload في كل إشعار</h3>
+<div class="code">// صيانة:    { "type": "maintenance_request", "id": "123" }
+// استشارة:  { "type": "consultation",         "id": "45"  }
+// حساب:     { "type": "account_status",        "is_active": "1" }
+// توصيل:    { "type": "delivery",              "id": "67"  }</div>
+
+<h2>6.3 ShopService</h2>
+<p><strong>الملف:</strong> app/Services/ShopService.php</p>
+
+<h3>findNearestShops(float lat, float lon, int radiusKm = 50): Collection</h3>
+<div class="section-box">
+<p>يستخدم <strong>معادلة Haversine</strong> في SQL لحساب المسافة بين نقطتين على الكرة الأرضية.</p>
+<div class="code">SELECT shops.*, (
+  6371 * acos(
+    cos(radians(?)) * cos(radians(latitude))
+    * cos(radians(longitude) - radians(?))
+    + sin(radians(?)) * sin(radians(latitude))
+  )
+) AS distance
+FROM shops
+WHERE is_active = 1
+HAVING distance &lt;= 50
+ORDER BY distance ASC</div>
+<p>تُرجع Collection من الصالات النشطة مرتبة من الأقرب للأبعد، مع حقل distance بالكيلومتر.</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 6. المتحكمات -->
+<h1 id="sec-7">7. المتحكمات (Controllers)</h1>
+
+<h2>7.1 CustomerAuthController</h2>
+<p><strong>الملف:</strong> app/Http/Controllers/Api/V1/CustomerAuthController.php</p>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف التفصيلي</th></tr>
+<tr><td>sendOtp()</td><td>POST /customer/send-otp</td><td>يستدعي OtpService::sendOtp - يرجع 429 إذا تجاوز الحد</td></tr>
+<tr><td>verifyOtp()</td><td>POST /customer/verify-otp</td><td>يرجع token للمسجل أو is_new_user=true للجديد</td></tr>
+<tr><td>register()</td><td>POST /customer/register</td><td>يتحقق من وجود OTP بـ phone_verified=true خلال 10 دقائق، ينشئ Customer، يحذف سجل OTP</td></tr>
+<tr><td>logout()</td><td>POST /customer/logout</td><td>يحذف كل tokens العميل (tokens()->delete())</td></tr>
+<tr><td>profile()</td><td>GET /customer/profile</td><td>بيانات العميل المصادَق</td></tr>
+<tr><td>deleteAccount()</td><td>POST /customer/delete-account</td><td>يحذف الـ tokens والحساب كاملاً</td></tr>
+<tr><td>updateFcmToken()</td><td>POST /customer/fcm-token</td><td>يحدّث حقل fcm_token للعميل</td></tr>
+</table>
+
+<h2>7.2 MaintenanceRequestController (العميل)</h2>
+<p><strong>الملف:</strong> app/Http/Controllers/Api/V1/MaintenanceRequestController.php</p>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>store()</td><td>POST /maintenance-requests</td><td>ينشئ طلب (status=pending)، يُرسل FCM+DB لفنيي الصالة، DB notification للأدمن</td></tr>
+<tr><td>index()</td><td>GET /maintenance-requests</td><td>طلبات العميل مرتبة تنازلياً (paginated 15)</td></tr>
+<tr><td>show()</td><td>GET /maintenance-requests/{id}</td><td>تفاصيل طلب مع القطع والعميل</td></tr>
+<tr><td>parts()</td><td>GET /maintenance-requests/{id}/parts</td><td>القطع المقترحة من الفني مع estimated_days</td></tr>
+<tr><td>cancel()</td><td>POST /maintenance-requests/{id}/cancel</td><td>إلغاء - يقبل فقط إذا status=pending - يُرسل FCM للفنيين</td></tr>
+<tr><td>approve()</td><td>POST /maintenance-requests/{id}/approve</td><td>تفصيل أدناه</td></tr>
+<tr><td>reject()</td><td>POST /maintenance-requests/{id}/reject</td><td>يُغير إلى cancelled + rejection_reason + FCM للفنيين</td></tr>
+</table>
+
+<h3>تفاصيل approve() - أكثر دالة تعقيداً</h3>
+<div class="section-box">
+<p>Body: { "selected_parts": [1,3,5], "payment_method": "cash_on_delivery", "latitude": 33.51, "longitude": 36.27 }</p>
+<div class="warn-box"><strong>تحديث:</strong> latitude وlongitude صارا <strong>إلزاميين</strong> (required) - العميل لازم يبعت موقعه الحالي هون، لأنو هاد الطلب هو يلي بينشئ توصيلة device_pickup وعامل التوصيل محتاج يعرف وين يروح.</div>
+<ol>
+<li>يتحقق أن كل القطع الإلزامية (is_required=true) موجودة في selected_parts</li>
+<li>يحسب estimated_cost = مجموع (price x quantity) للقطع المختارة فقط</li>
+<li>لكل قطعة مختارة: ينقص stock_quantity من spare_parts</li>
+<li>يُغير status → "approved" و customer_status → "approved"</li>
+<li>ينشئ <code>Delivery::create([...'latitude'=>..., 'longitude'=>..., 'address'=>...])</code> - الموقع يُنسخ هون من الـ request مباشرة إلى جدول deliveries (وليس إلى maintenance_requests نفسها)</li>
+<li>يُرسل FCM + <strong>Notification::create(customer_id)</strong> للعميل: "تم إنشاء طلب التوصيل"</li>
+<li>يُرسل FCM لفنيي الصالة: "Diagnosis Approved"</li>
+<li><strong>كل هذا داخل DB::transaction() - يتراجع عند أي خطأ</strong></li>
+</ol>
+<div class="code">Delivery::create([
+    'type' => 'device_pickup', 'status' => 'pending',
+    'customer_id' => $mr->customer_id, 'shop_id' => $mr->shop_id,
+    'latitude' => $request->validated('latitude'),
+    'longitude' => $request->validated('longitude'),
+    'maintenance_request_id' => $mr->id,
+    'payment_method' => $paymentMethod === 'cash_on_delivery' ? 'cash_on_delivery' : 'prepaid',
+]);</div>
+</div>
+
+<h2>7.3 CartController (العميل)</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /cart</td><td>محتويات السلة مع بيانات المنتج والصالة</td></tr>
+<tr><td>store()</td><td>POST /cart</td><td>يتحقق من is_active والمخزون - إذا المنتج موجود يجمع الكميات</td></tr>
+<tr><td>destroy()</td><td>DELETE /cart/{id}</td><td>حذف عنصر (مقيّد بعميل الجلسة الحالية)</td></tr>
+</table>
+
+<h2>7.4 OrderController (العميل)</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>checkout()</td><td>POST /checkout</td><td>تفصيل أدناه</td></tr>
+<tr><td>index()</td><td>GET /orders</td><td>سجل طلبيات العميل مع تفاصيل المنتجات والصالات</td></tr>
+</table>
+
+<h3>تفاصيل checkout() - كل شيء في transaction واحدة</h3>
+<div class="section-box">
+<div class="warn-box"><strong>تحديث:</strong> latitude وlongitude صارا <strong>إلزاميين</strong> بالـ body (CheckoutRequest) - نفس سبب approve(): بدون موقع العميل ما في طريقة لعامل التوصيل يوصله.</div>
+<ol>
+<li>يجمع عناصر السلة حسب shop_id ← كل صالة = طلبية منفصلة</li>
+<li><strong>يتحقق أن shop.is_active=true</strong> لكل مجموعة قبل إنشاء أي شيء - إذا صالة معطّلة يرمي Exception فيلغي كامل الـ transaction (400 Bad Request)</li>
+<li>لكل صالة: ينشئ Order + OrderItems + ينقص stock_quantity + ينشئ Delivery (نوع accessory_delivery) مع latitude/longitude/address منسوخين من الـ request</li>
+<li>يمسح السلة كاملة بعد النجاح</li>
+<li>يُرسل FCM + <strong>Notification::create(customer_id)</strong> للعميل: "تم إنشاء طلب التوصيل"</li>
+<li>إذا فشل أي خطوة: يتراجع كل شيء (DB::transaction)</li>
+</ol>
+<div class="code">foreach ($groupedCartItems as $shopId => $items) {
+    if (! $items->first()->accessory->shop?->is_active) {
+        throw new Exception("Shop for item '{$items->first()->accessory->name}' is currently unavailable.");
+    }
+    // ... إنشاء Order + Delivery
+}</div>
+</div>
+
+<h2>7.5 Customer/ConsultationController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>store()</td><td>POST /consultations</td><td>تفصيل أدناه</td></tr>
+<tr><td>index()</td><td>GET /consultations</td><td>استشارات العميل مرتبة تنازلياً</td></tr>
+</table>
+
+<h3>منطق store() - نوعان</h3>
+<div class="section-box">
+<p><strong>consultation_type = 'ai':</strong></p>
+<ol>
+<li>يجرب النموذج: gemini-2.5-flash-lite</li>
+<li>إذا فشل يجرب: gemini-flash-latest</li>
+<li>يدور على مفاتيح GEMINI_API_KEYS (مفصولة بفاصلة في .env)</li>
+<li>يحفظ الرد في reply، status → ai_answered</li>
+</ol>
+<p><strong>consultation_type = 'technician':</strong></p>
+<ol>
+<li>يُرسل FCM لكل الفنيين النشطين الذين لديهم fcm_token</li>
+<li>يُنشئ DB notification في جدول notifications للأدمن</li>
+<li>status → pending</li>
+</ol>
+</div>
+
+<h2>7.6 Technician/MaintenanceRequestController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /technician/maintenance-requests</td><td>طلبات صالة الفني فقط (shop_id) - paginated 15</td></tr>
+<tr><td>show()</td><td>GET /technician/maintenance-requests/{id}</td><td>تفاصيل مع القطع - مقيّد بـ shop_id الفني</td></tr>
+<tr><td>updateStatus()</td><td>POST /technician/maintenance-requests/{id}/status</td><td>يقبل فقط: under_inspection أو completed + FCM <strong>و Notification::create</strong> للعميل</td></tr>
+<tr><td>diagnose()</td><td>POST /technician/maintenance-requests/{id}/diagnose</td><td>تفصيل أدناه</td></tr>
+</table>
+
+<h3>تفاصيل diagnose()</h3>
+<div class="section-box">
+<p>Body: { "estimated_days": 3, "parts": [{"spare_part_id":1, "quantity":2, "is_required":true}] }</p>
+<ol>
+<li>يحذف القطع السابقة للطلب (إن وجدت) - يبدأ من صفر</li>
+<li>لكل قطعة: يجلب SparePart ويُنشئ MaintenanceRequestPart بـ name وprice منسوخة</li>
+<li>يُغير status → waiting_customer_approval و customer_status → pending_approval</li>
+<li>يرسل FCM <strong>+ Notification::create(customer_id)</strong> للعميل: "Diagnosis Ready - Your device has been diagnosed"</li>
+<li>كل هذا في DB::transaction()</li>
+</ol>
+<div class="warn-box">كل نقطة إشعار للعميل هلق مزدوجة: FCM (push فوري لو التطبيق مثبّت التوكن) + Notification::create (يبقى بقاعدة البيانات حتى لو ما وصل الـ push، يقدر العميل يشوفو من GET /customer/notifications).</div>
+</div>
+
+<h2>7.7 Technician/ConsultationController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /technician/consultations</td><td>كل استشارات نوع technician (pending وanswered)</td></tr>
+<tr><td>reply()</td><td>POST /technician/consultations/{id}/reply</td><td>يُعيَّن technician_id، يحفظ الرد، status→answered، FCM + Notification::create للعميل</td></tr>
+</table>
+
+<h2>7.8 Delivery/DeliveryController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /delivery/requests</td><td>التوصيلات بحالة pending وبدون عامل مُعيَّن - يحمّل shop مع latitude/longitude</td></tr>
+<tr><td>accept()</td><td>POST /delivery/requests/{id}/accept</td><td>تفصيل أدناه - تحديث جوهري</td></tr>
+<tr><td>reject()</td><td>POST /delivery/requests/{id}/reject</td><td>يُحرَّر العامل من التوصيلة</td></tr>
+<tr><td>show()</td><td>GET /delivery/requests/{id}</td><td>تفاصيل توصيلة مع بيانات العميل والصالة</td></tr>
+<tr><td>updateStatus()</td><td>POST /delivery/requests/{id}/status</td><td>on_the_way أو arrived + FCM + Notification::create للعميل</td></tr>
+<tr><td>confirm()</td><td>POST /delivery/requests/{id}/confirm</td><td>confirmation_code أو صورة + status→delivered + FCM/Notification للعميل + FCM للأدمن</td></tr>
+<tr><td>collectCash()</td><td>POST /delivery/requests/{id}/collect-cash</td><td>يُسجَّل cash_amount وcash_collected=true + FCM للأدمن</td></tr>
+<tr><td>history()</td><td>GET /delivery/history</td><td>التوصيلات المكتملة لعامل التوصيل</td></tr>
+<tr><td>earnings()</td><td>GET /delivery/earnings</td><td>إجمالي الكاش المحصَّل اليوم</td></tr>
+</table>
+
+<h3>تفاصيل accept() - أهم تحديث بالمشروع مؤخراً</h3>
+<div class="section-box">
+<div class="warn-box"><strong>قبل:</strong> كان الأدمن هو من يحدد estimated_time وقت إنشاء التوصيلة يدوياً. <strong>الآن:</strong> عامل التوصيل هو من يحدد الوقت المتوقع للوصول - بالضبط وقت ما يضغط "قبول الطلب"، لأنو هو الوحيد يلي بيعرف فعلياً قديش رح ياخد وصولو (حسب موقعه وزحمة الطريق).</div>
+<p>Body إلزامي الآن: { "estimated_time": "2026-06-11 15:30:00" } - عبر <code>AcceptDeliveryRequest</code> (Form Request جديد، <code>estimated_time =&gt; ['required','date']</code>)</p>
+<div class="code">public function accept(AcceptDeliveryRequest $request, int $id): JsonResponse
+{
+    $delivery->update([
+        'delivery_worker_id' => $worker->id,
+        'status' => 'accepted',
+        'estimated_time' => $request->validated('estimated_time'),
+    ]);
+    // FCM + Notification::create للعميل: "عامل التوصيل في الطريق إليك"
+}</div>
+</div>
+
+<h2>7.9 Admin/TechnicianController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /admin/technicians</td><td>تفصيل أدناه - تحديث لدعم ويدجت "حالة الفنيين" بالداشبورد</td></tr>
+<tr><td>store()</td><td>POST /admin/technicians</td><td>ينشئ فني - كلمة مرور عشوائية أو مخصصة - يرجع temporary_password</td></tr>
+<tr><td>update()</td><td>POST /admin/technicians/{id}</td><td>يُعدّل البيانات - إذا تغيرت is_active يُرسل FCM للفني</td></tr>
+<tr><td>destroy()</td><td>DELETE أو POST /{id}/delete</td><td>حذف الفني نهائياً</td></tr>
+</table>
+
+<h3>تفاصيل index() - full_name وis_busy المحسوبة</h3>
+<div class="section-box">
+<p>الجدول الأصلي لا يحتوي عمود "الاسم الكامل" ولا "مشغول/متاح" - كلاهما يُحسَبان في الكونترولر قبل الإرسال:</p>
+<div class="code">$busyShopIds = MaintenanceRequest::whereIn('status', MaintenanceRequest::ACTIVE_STATUSES)
+    ->pluck('shop_id')->unique();
+
+$technicians->getCollection()->transform(function (Technician $t) use ($busyShopIds) {
+    $t->full_name = trim($t->first_name . ' ' . $t->last_name);
+    $t->is_busy   = $busyShopIds->contains($t->shop_id);
+    return $t;
+});</div>
+<p><strong>ملاحظة مهمة (قرار تصميم):</strong> النظام لا يربط طلب الصيانة بفني محدد (لا يوجد عمود technician_id في maintenance_requests) - أي فني بنفس الصالة يقدر ياخذ أي طلب. لذلك "مشغول" هنا معناه "صالة الفني عندها طلب نشط حالياً"، وليس "هالفني بالذات يشتغل عليه" - وهذا محدود بتصميم قاعدة البيانات الحالي.</p>
+</div>
+
+<h2>7.10 Admin/SparePartController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /admin/spare-parts</td><td>كل قطع الغيار مع بيانات الصالة</td></tr>
+<tr><td>store()</td><td>POST /admin/spare-parts</td><td>إضافة قطعة جديدة</td></tr>
+<tr><td>update()</td><td>PUT /admin/spare-parts/{id}</td><td>تعديل</td></tr>
+<tr><td>destroy()</td><td>DELETE أو POST /{id}/delete</td><td>حذف</td></tr>
+<tr><td>indexStockRequests()</td><td>GET /admin/stock-requests</td><td>طلبات التزويد مع بيانات الصالة والقطعة</td></tr>
+<tr><td>requestStock()</td><td>POST /admin/stock-requests</td><td>طلب تزويد جديد + DB notification للأدمن</td></tr>
+<tr><td>approveStockRequest()</td><td>POST /admin/stock-requests/{id}/approve</td><td>موافقة + زيادة stock_quantity للقطعة</td></tr>
+</table>
+
+<h2>7.11 Admin/AdminDeliveryController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /admin/deliveries</td><td>كل التوصيلات مع فلاتر</td></tr>
+<tr><td>store()</td><td>POST /admin/deliveries</td><td>ينشئ توصيلة + FCM/Notification للعميل + DB notification للأدمن</td></tr>
+<tr><td>update()</td><td>PATCH /admin/deliveries/{id}</td><td>تعديل - يتحقق أن delivery_worker_id ينتمي لنفس shop_id</td></tr>
+</table>
+<div class="warn-box"><strong>تحديث:</strong> حقل <code>estimated_time</code> اتشال نهائياً من StoreDeliveryRequest - الأدمن ما عاد يقدر يحدد الوقت المتوقع هون، صار حصراً مسؤولية عامل التوصيل عند القبول (راجع 7.8).</div>
+
+<h2>7.12 Admin/AdminDashboardController</h2>
+<div class="code">GET /api/v1/admin/dashboard/stats</div>
+<p>يُرجع إحصائيات مع مقارنة أسبوعية:</p>
+<ul>
+<li>إجمالي طلبات الصيانة + نسبة التغيير عن الأسبوع الماضي</li>
+<li>الطلبات المنجزة (completed) + نسبة التغيير</li>
+<li>الإيرادات الإجمالية (صيانة + ملحقات) + نسبة التغيير</li>
+<li>عدد العملاء + الفنيين النشطين + الصالات النشطة</li>
+</ul>
+
+<h2>7.13 Admin/AdminMaintenanceRequestController</h2>
+<div class="code">GET /api/v1/admin/maintenance-requests?status=pending&amp;shop_id=1&amp;search=SHM</div>
+<p>يدعم الفلاتر: status, shop_id, search (يبحث في tracking_number وdevice_model واسم العميل)</p>
+
+<h2>7.14 Admin/AdminOrderController</h2>
+<div class="code">GET /api/v1/admin/orders?shop_id=1&amp;search=ahmed</div>
+<p>يدعم الفلاتر: shop_id, search (يبحث في order_number واسم العميل وهاتفه)</p>
+
+<h2>7.15 Admin/ShopController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /admin/shops</td><td>تفصيل أدناه - تحديث كبير</td></tr>
+<tr><td>store() / update()</td><td>POST /admin/shops / PUT /admin/shops/{id}</td><td>CRUD + رفع صورة + rating + is_active</td></tr>
+<tr><td>destroy()</td><td>DELETE أو POST /{id}/delete</td><td>حذف الصالة</td></tr>
+</table>
+<div class="section-box">
+<p><strong>تحديثات index():</strong></p>
+<ol>
+<li>الترتيب صار <code>orderByDesc('rating')</code> بدل الأحدث - أفضل تقييم يظهر أولاً</li>
+<li>يُضاف حقل محسوب <code>availability_status</code>: "busy" إذا عند الصالة طلب صيانة نشط حالياً (بنفس ثابت MaintenanceRequest::ACTIVE_STATUSES)، وإلا "available"</li>
+</ol>
+<div class="code">$shops = Shop::withCount('maintenanceRequests')
+    ->withCount(['maintenanceRequests as active_requests_count' => fn($q) =>
+        $q->whereIn('status', MaintenanceRequest::ACTIVE_STATUSES)])
+    ->orderByDesc('rating')->paginate(15);
+
+$shop->availability_status = $shop->active_requests_count > 0 ? 'busy' : 'available';</div>
+<p><strong>تحديثات store()/update():</strong> StoreShopRequest/UpdateShopRequest صارا يقبلان <code>rating</code> (0-5) و<code>is_active</code> (تفعيل/تعطيل). لما is_active=false: الصالة تختفي من /shops/nearest (ShopService)، من /accessories (فلترة إضافية على shop.is_active)، وأي محاولة إنشاء طلب صيانة عليها ترجع 422 (StoreMaintenanceRequest يتحقق شرط <code>Rule::exists('shops','id')->where('is_active', true)</code>).</p>
+</div>
+
+<h2>7.16 Admin/AccessoryController</h2>
+<p>نفس نمط ShopController: CRUD كامل مع رفع صورة عبر Storage::disk('public') إلى storage/app/public/accessories/. عند التعديل يحذف الصورة القديمة أولاً ثم يرفع الجديدة. URL الصورة: url('storage/accessories/filename.jpg').</p>
+
+<h2>7.17 Admin/DeliveryWorkerController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /admin/delivery-workers</td><td>قائمة عمال التوصيل مع فلتر shop_id اختياري</td></tr>
+<tr><td>store()</td><td>POST /admin/delivery-workers</td><td>ينشئ عامل توصيل - بدون كلمة مرور (OTP فقط للدخول)</td></tr>
+<tr><td>update()</td><td>PUT /admin/delivery-workers/{id}</td><td>تعديل البيانات / تفعيل-تعطيل الحساب</td></tr>
+<tr><td>destroy()</td><td>DELETE أو POST /{id}/delete</td><td>حذف العامل</td></tr>
+</table>
+
+<h2>7.18 Customer/DeliveryController</h2>
+<table>
+<tr><th>الدالة</th><th>Route</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /customer/deliveries</td><td>توصيلات العميل الحالي فقط (customer_id مقيَّد بالمستخدم المصادَق)</td></tr>
+<tr><td>show()</td><td>GET /customer/deliveries/{id}</td><td>تفاصيل توصيلة واحدة - 404 لو ما تخص العميل الحالي</td></tr>
+</table>
+
+<h2>7.19 Admin/NotificationController و Technician/NotificationController و Customer/NotificationController</h2>
+<p>ثلاثة كونترولرات منفصلة (واحد لكل دور) لكن بنفس البنية <strong>تماماً</strong> - فرق فقط بالعمود المستخدَم بالفلترة (admin_id / technician_id / customer_id):</p>
+<table>
+<tr><th>الدالة</th><th>Route (لكل دور)</th><th>الوصف</th></tr>
+<tr><td>index()</td><td>GET /{role}/notifications</td><td>آخر 20 إشعار (<code>latest()->limit(20)</code>) مع unread_count منفصل</td></tr>
+<tr><td>markAllRead()</td><td>POST /{role}/notifications/mark-all-read</td><td>يُعيَّن is_read=true لكل إشعارات المستخدم غير المقروءة دفعة واحدة</td></tr>
+<tr><td>markRead()</td><td>POST /{role}/notifications/{id}/read</td><td>يُعيَّن is_read=true لإشعار محدد - findOrFail مقيَّد بصاحب الإشعار (404 لغير المالك)</td></tr>
+</table>
+<div class="info-box"><strong>Customer/NotificationController أُضيف حديثاً</strong> - قبله كان العميل يستقبل إشعارات FCM فقط بدون أي سجل دائم يقدر يرجع يشوفه من داخل التطبيق. الآن كل الأحداث المذكورة بالقسم 11 تُنشئ صف Notification لصاحب العلاقة.</div>
+
+<div class="page-break"></div>
+
+<!-- 8. Routes -->
+<h1 id="sec-8">8. جدول كل الـ Routes</h1>
+
+<h2>المصادقة العامة</h2>
+<table>
+<tr><th>Method</th><th>URL</th><th>Auth</th><th>الوصف</th></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/auth/login</td><td>-</td><td>دخول Admin أو Technician بـ email+password</td></tr>
+</table>
+
+<h2>Routes العميل</h2>
+<table>
+<tr><th>Method</th><th>URL</th><th>Auth</th><th>الوصف</th></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/send-otp</td><td>-</td><td>إرسال OTP</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/verify-otp</td><td>-</td><td>التحقق من OTP</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/register</td><td>-</td><td>تسجيل مستخدم جديد</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/logout</td><td>✓</td><td>تسجيل خروج</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/customer/profile</td><td>✓</td><td>الملف الشخصي</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/delete-account</td><td>✓</td><td>حذف الحساب</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/fcm-token</td><td>✓</td><td>تحديث رمز FCM</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/customer/deliveries</td><td>✓</td><td>توصيلاتي</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/customer/deliveries/{id}</td><td>✓</td><td>تفاصيل توصيلة</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/customer/notifications</td><td>✓</td><td>إشعاراتي (آخر 20) <em>(جديد)</em></td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/notifications/mark-all-read</td><td>✓</td><td>تعليم الكل مقروء <em>(جديد)</em></td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/customer/notifications/{id}/read</td><td>✓</td><td>تعليم إشعار مقروء <em>(جديد)</em></td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/shops/nearest</td><td>✓</td><td>أقرب صالة بالإحداثيات</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/maintenance-requests</td><td>✓</td><td>إنشاء طلب صيانة</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/maintenance-requests</td><td>✓</td><td>طلباتي</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/maintenance-requests/{id}</td><td>✓</td><td>تفاصيل طلب</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/maintenance-requests/{id}/parts</td><td>✓</td><td>قطع التشخيص</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/maintenance-requests/{id}/cancel</td><td>✓</td><td>إلغاء الطلب (pending فقط)</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/maintenance-requests/{id}/approve</td><td>✓</td><td>موافقة على التشخيص</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/maintenance-requests/{id}/reject</td><td>✓</td><td>رفض التشخيص</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/accessories</td><td>✓</td><td>الملحقات (فلتر shop_id اختياري)</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/accessories/{id}</td><td>✓</td><td>تفاصيل ملحق</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/cart</td><td>✓</td><td>السلة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/cart</td><td>✓</td><td>إضافة للسلة</td></tr>
+<tr><td><span class="m-delete">DELETE</span></td><td>/api/v1/cart/{id}</td><td>✓</td><td>حذف من السلة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/checkout</td><td>✓</td><td>إتمام الشراء</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/orders</td><td>✓</td><td>طلبياتي</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/consultations</td><td>✓</td><td>إنشاء استشارة</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/consultations</td><td>✓</td><td>استشاراتي</td></tr>
+</table>
+
+<h2>Routes الفني</h2>
+<table>
+<tr><th>Method</th><th>URL</th><th>Auth</th><th>الوصف</th></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/send-otp</td><td>-</td><td>إرسال OTP</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/verify-otp</td><td>-</td><td>التحقق من OTP</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/logout</td><td>✓</td><td>تسجيل خروج</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/technician/profile</td><td>✓</td><td>الملف الشخصي مع الصالة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/fcm-token</td><td>✓</td><td>تحديث FCM</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/technician/maintenance-requests</td><td>✓</td><td>طلبات صالته</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/technician/maintenance-requests/{id}</td><td>✓</td><td>تفاصيل طلب</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/maintenance-requests/{id}/status</td><td>✓</td><td>تغيير الحالة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/maintenance-requests/{id}/diagnose</td><td>✓</td><td>إرسال التشخيص</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/technician/spare-parts</td><td>✓</td><td>قطع غيار صالته</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/technician/consultations</td><td>✓</td><td>الاستشارات</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/consultations/{id}/reply</td><td>✓</td><td>الرد على استشارة</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/technician/notifications</td><td>✓</td><td>الإشعارات (آخر 20)</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/notifications/mark-all-read</td><td>✓</td><td>تعليم الكل مقروء</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/technician/notifications/{id}/read</td><td>✓</td><td>تعليم إشعار مقروء</td></tr>
+</table>
+
+<h2>Routes عامل التوصيل</h2>
+<table>
+<tr><th>Method</th><th>URL</th><th>Auth</th><th>الوصف</th></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/send-otp</td><td>-</td><td>إرسال OTP</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/verify-otp</td><td>-</td><td>التحقق من OTP</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/logout</td><td>✓</td><td>تسجيل خروج</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/delivery/profile</td><td>✓</td><td>الملف الشخصي</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/fcm-token</td><td>✓</td><td>تحديث FCM</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/delivery/requests</td><td>✓</td><td>التوصيلات المتاحة</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/delivery/requests/{id}</td><td>✓</td><td>تفاصيل توصيلة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/requests/{id}/accept</td><td>✓</td><td>قبول</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/requests/{id}/reject</td><td>✓</td><td>رفض</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/requests/{id}/status</td><td>✓</td><td>on_the_way أو arrived</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/requests/{id}/confirm</td><td>✓</td><td>تأكيد التسليم</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/delivery/requests/{id}/collect-cash</td><td>✓</td><td>تسجيل تحصيل الكاش</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/delivery/history</td><td>✓</td><td>سجل التوصيلات</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/delivery/earnings</td><td>✓</td><td>أرباح اليوم</td></tr>
+</table>
+
+<h2>Routes الأدمن (كلها تحتاج Auth)</h2>
+<table>
+<tr><th>Method</th><th>URL</th><th>الوصف</th></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/profile</td><td>الملف الشخصي</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/profile</td><td>تعديل الملف الشخصي</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/change-password</td><td>تغيير كلمة المرور</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/logout</td><td>تسجيل خروج</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/dashboard/stats</td><td>إحصائيات لوحة التحكم</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/shops</td><td>كل الصالات</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/shops</td><td>إضافة صالة</td></tr>
+<tr><td><span class="m-put">PUT</span></td><td>/api/v1/admin/shops/{id}</td><td>تعديل صالة</td></tr>
+<tr><td><span class="m-delete">DELETE</span></td><td>/api/v1/admin/shops/{id}</td><td>حذف صالة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/shops/{id}/delete</td><td>حذف صالة (بديل POST للهوستينج)</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/technicians</td><td>كل الفنيين</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/technicians</td><td>إضافة فني</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/technicians/{id}</td><td>تعديل فني</td></tr>
+<tr><td><span class="m-delete">DELETE</span></td><td>/api/v1/admin/technicians/{id}</td><td>حذف فني</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/technicians/{id}/delete</td><td>حذف فني (بديل POST)</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/spare-parts</td><td>قطع الغيار</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/spare-parts</td><td>إضافة قطعة</td></tr>
+<tr><td><span class="m-put">PUT</span></td><td>/api/v1/admin/spare-parts/{id}</td><td>تعديل قطعة</td></tr>
+<tr><td><span class="m-delete">DELETE</span></td><td>/api/v1/admin/spare-parts/{id}</td><td>حذف قطعة</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/spare-parts/{id}/delete</td><td>حذف قطعة (بديل POST)</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/stock-requests</td><td>طلبات التزويد</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/stock-requests</td><td>إنشاء طلب تزويد</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/stock-requests/{id}/approve</td><td>موافقة على طلب تزويد</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/accessories</td><td>الملحقات</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/accessories</td><td>إضافة ملحق</td></tr>
+<tr><td><span class="m-put">PUT</span></td><td>/api/v1/admin/accessories/{id}</td><td>تعديل ملحق</td></tr>
+<tr><td><span class="m-delete">DELETE</span></td><td>/api/v1/admin/accessories/{id}</td><td>حذف ملحق</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/accessories/{id}/delete</td><td>حذف ملحق (بديل POST)</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/delivery-workers</td><td>عمال التوصيل</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/delivery-workers</td><td>إضافة عامل</td></tr>
+<tr><td><span class="m-put">PUT</span></td><td>/api/v1/admin/delivery-workers/{id}</td><td>تعديل عامل</td></tr>
+<tr><td><span class="m-delete">DELETE</span></td><td>/api/v1/admin/delivery-workers/{id}</td><td>حذف عامل</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/delivery-workers/{id}/delete</td><td>حذف عامل (بديل POST)</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/notifications</td><td>إشعارات الأدمن (آخر 20)</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/notifications/mark-all-read</td><td>تعليم الكل مقروء</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/notifications/{id}/read</td><td>تعليم إشعار مقروء</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/maintenance-requests</td><td>كل طلبات الصيانة مع فلاتر</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/orders</td><td>كل الطلبيات مع فلاتر</td></tr>
+<tr><td><span class="m-get">GET</span></td><td>/api/v1/admin/deliveries</td><td>كل التوصيلات</td></tr>
+<tr><td><span class="m-post">POST</span></td><td>/api/v1/admin/deliveries</td><td>إنشاء توصيلة</td></tr>
+<tr><td><span class="m-put">PUT</span></td><td>/api/v1/admin/deliveries/{id}</td><td>تعديل توصيلة</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- 8. Form Requests -->
+<h1 id="sec-9">9. Form Requests - قواعد التحقق</h1>
+<table>
+<tr><th>الكلاس</th><th>الحقل</th><th>القواعد</th></tr>
+<tr><td>SendOtpRequest</td><td>phone</td><td>required, string, regex: /^\+963[0-9]{9}$/</td></tr>
+<tr><td>VerifyOtpRequest</td><td>phone / code</td><td>phone: regex +963 / code: required, string, size:5</td></tr>
+<tr><td>RegisterCustomerRequest</td><td>first_name, last_name, phone, email?, birthdate?</td><td>phone: unique:customers / email: nullable unique</td></tr>
+<tr><td>StoreMaintenanceRequest</td><td>shop_id, device_model, problem_description</td><td>shop_id: <code>Rule::exists('shops','id')->where('is_active', true)</code> <em>(محدَّث - يرفض الصالات المعطّلة)</em></td></tr>
+<tr><td>ApproveMaintenanceRequest</td><td>selected_parts[], payment_method, <strong>latitude, longitude</strong>, address?</td><td>latitude/longitude: <strong>required</strong>, numeric, between <em>(محدَّث)</em> / selected_parts.*: exists / payment_method: in:cash_on_delivery,pay_after_service</td></tr>
+<tr><td>RejectMaintenanceRequest</td><td>rejection_reason</td><td>nullable, string</td></tr>
+<tr><td>StoreConsultationRequest</td><td>consultation_type, message?, image?</td><td>type: in:technician,ai / message: required_without:image / image: image, max:5120KB</td></tr>
+<tr><td>DiagnoseRequest</td><td>estimated_days, parts[]</td><td>estimated_days: integer min:1 / parts.*.spare_part_id: exists:spare_parts,id / parts.*.is_required: boolean</td></tr>
+<tr><td>UpdateStatusRequest</td><td>status</td><td>required, in:under_inspection,completed</td></tr>
+<tr><td>ReplyConsultationRequest</td><td>reply</td><td>required, string, min:5</td></tr>
+<tr><td>StoreTechnicianRequest</td><td>first_name, last_name, phone, email?, shop_id, specialization, experience, is_active?, password?</td><td>phone: regex+unique / email: nullable unique / shop_id: exists / password: nullable min:8</td></tr>
+<tr><td>UpdateTechnicianRequest</td><td>نفس store</td><td>كل الحقول بـ sometimes + ignore الـ unique للسجل الحالي</td></tr>
+<tr><td>StoreShopRequest</td><td>name, address, phone, latitude, longitude, <strong>rating?, is_active?</strong>, image?</td><td>rating: nullable, numeric, 0-5 / is_active: nullable, boolean <em>(محدَّث)</em></td></tr>
+<tr><td>UpdateShopRequest</td><td>نفس store (كلها sometimes)</td><td>rating/is_active: sometimes <em>(محدَّث)</em></td></tr>
+<tr><td>StoreDeliveryRequest</td><td>type, customer_id, shop_id, maintenance_request_id?, order_id?</td><td>type: in:device_pickup,device_dropoff,accessory_delivery / <strong>estimated_time اتشال نهائياً</strong> <em>(محدَّث)</em></td></tr>
+<tr><td><strong>AcceptDeliveryRequest</strong> <em>(جديد)</em></td><td>estimated_time</td><td>required, date - يفرضه على عامل التوصيل عند القبول بدل الأدمن</td></tr>
+<tr><td>UpdateDeliveryStatusRequest</td><td>status</td><td>required, in:on_the_way,arrived</td></tr>
+<tr><td>ConfirmDeliveryRequest</td><td>confirmation_code?, image?</td><td>required_without لأحدهما على الأقل / image: image max:5120KB</td></tr>
+<tr><td>CollectCashRequest</td><td>cash_amount</td><td>required, numeric, min:0</td></tr>
+<tr><td>CheckoutRequest</td><td>payment_method, <strong>latitude, longitude</strong>, address?</td><td>latitude/longitude: <strong>required</strong>, numeric, between <em>(محدَّث)</em></td></tr>
+<tr><td>FindNearestShopRequest</td><td>latitude, longitude</td><td>required, numeric</td></tr>
+<tr><td>AddToCartRequest</td><td>accessory_id, quantity</td><td>accessory_id: exists:accessories,id / quantity: integer min:1</td></tr>
+</table>
+<div class="info-box">كل Form Request: authorize() يرجع true دائماً - التحقق من الصلاحيات يتم عبر auth:sanctum middleware.</div>
+
+<div class="page-break"></div>
+
+<!-- 9. آلة الحالات -->
+<h1 id="sec-10">10. آلة حالات طلب الصيانة والتوصيل</h1>
+
+<h2>10.1 حالات طلب الصيانة</h2>
+<table>
+<tr><th>الحالة</th><th>من يُغيّرها</th><th>الـ Endpoint</th><th>الشرط / الملاحظة</th></tr>
+<tr><td><span class="yellow">pending</span></td><td>تلقائي</td><td>POST /maintenance-requests</td><td>عند إنشاء الطلب</td></tr>
+<tr><td><span class="blue">under_inspection</span></td><td>الفني</td><td>POST /{id}/status {status:"under_inspection"}</td><td>FCM للعميل: "Request Under Inspection"</td></tr>
+<tr><td><span class="yellow">waiting_customer_approval</span></td><td>تلقائي بعد diagnose</td><td>POST /{id}/diagnose</td><td>customer_status → pending_approval / FCM للعميل: "Diagnosis Ready"</td></tr>
+<tr><td><span class="blue">approved</span></td><td>العميل</td><td>POST /{id}/approve</td><td>يتحقق من القطع الإلزامية / ينقص المخزون / FCM للفنيين</td></tr>
+<tr><td><span class="green">completed</span></td><td>الفني</td><td>POST /{id}/status {status:"completed"}</td><td>FCM للعميل: "Repair Completed"</td></tr>
+<tr><td><span class="red">cancelled</span></td><td>العميل</td><td>POST /{id}/cancel أو /reject</td><td>cancel: من pending فقط / reject: من waiting_customer_approval</td></tr>
+</table>
+
+<h3>حالة العميل الموازية (customer_status)</h3>
+<table>
+<tr><th>القيمة</th><th>المعنى</th></tr>
+<tr><td>null</td><td>لم يصل الطلب للتشخيص بعد</td></tr>
+<tr><td>pending_approval</td><td>ينتظر قرار العميل بعد إرسال التشخيص</td></tr>
+<tr><td>approved</td><td>وافق العميل على التشخيص والقطع</td></tr>
+<tr><td>rejected</td><td>رفض العميل (status يصير cancelled)</td></tr>
+</table>
+
+<h2>10.2 حالات التوصيل (Delivery)</h2>
+<table>
+<tr><th>الحالة</th><th>من يُغيّرها</th><th>الـ Endpoint</th><th>FCM</th></tr>
+<tr><td><span class="yellow">pending</span></td><td>تلقائي</td><td>عند إنشاء التوصيلة</td><td>FCM للعميل عند الإنشاء</td></tr>
+<tr><td><span class="blue">accepted</span></td><td>عامل التوصيل</td><td>POST /delivery/requests/{id}/accept</td><td>FCM للعميل + <strong>يجب إرفاق estimated_time</strong></td></tr>
+<tr><td><span class="blue">on_the_way</span></td><td>عامل التوصيل</td><td>POST /delivery/requests/{id}/status</td><td>FCM للعميل</td></tr>
+<tr><td><span class="blue">arrived</span></td><td>عامل التوصيل</td><td>POST /delivery/requests/{id}/status</td><td>FCM للعميل</td></tr>
+<tr><td><span class="green">delivered</span></td><td>عامل التوصيل (تلقائي)</td><td>POST /delivery/requests/{id}/confirm</td><td>FCM للعميل + الأدمن</td></tr>
+<tr><td><span class="red">rejected</span></td><td>عامل التوصيل</td><td>POST /delivery/requests/{id}/reject</td><td>-</td></tr>
+</table>
+
+<h2>10.3 حالات محسوبة (Computed States) - غير مخزَّنة بقاعدة البيانات</h2>
+<div class="section-box">
+<p>هذه القيم لا تُخزَّن كأعمدة، بل تُحسَب في كل request من بيانات موجودة أصلاً - لتجنّب تكرار البيانات (Data Duplication) وضمان أنها دائماً محدَّثة لحظياً:</p>
+<table>
+<tr><th>الحالة</th><th>أين تظهر</th><th>كيف تُحسَب</th></tr>
+<tr><td>availability_status لصالة (available/busy)</td><td>GET /admin/shops</td><td>busy إذا كان للصالة طلب صيانة واحد على الأقل بحالة من MaintenanceRequest::ACTIVE_STATUSES</td></tr>
+<tr><td>is_busy لفني (true/false)</td><td>GET /admin/technicians</td><td>true إذا كانت صالة الفني ضمن الصالات "المشغولة" أعلاه (نفس الثابت)</td></tr>
+</table>
+<p><strong>الثابت الموحَّد:</strong> <code>MaintenanceRequest::ACTIVE_STATUSES = ['pending','under_inspection','waiting_customer_approval','approved']</code> - يُستخدم بالضبط بنفس القيم بمكانين مختلفين لضمان التناسق (لا يُعرَّف مرتين).</p>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 10. الإشعارات -->
+<h1 id="sec-11">11. نظام الإشعارات - FCM + قاعدة البيانات</h1>
+
+<h2>تسجيل رمز FCM</h2>
+<div class="code">POST /api/v1/customer/fcm-token     { "fcm_token": "..." }
+POST /api/v1/technician/fcm-token   { "fcm_token": "..." }
+POST /api/v1/delivery/fcm-token     { "fcm_token": "..." }
+POST /api/v1/admin/update-fcm-token { "fcm_token": "..." }</div>
+
+<h2>مصفوفة الإشعارات (FCM = Push فوري، DB = يبقى بجدول notifications ويظهر بـ GET /{role}/notifications)</h2>
+<table>
+<tr><th>الحدث</th><th>المُفعِّل</th><th>المستقبِل</th><th>العنوان</th><th>النوع</th></tr>
+<tr><td>إنشاء طلب صيانة</td><td>العميل</td><td>فنيو الصالة (FCM+DB) + الأدمن (DB)</td><td>New Maintenance Request</td><td>maintenance_request</td></tr>
+<tr><td>إلغاء الطلب</td><td>العميل</td><td>فنيو الصالة (FCM+DB)</td><td>Request Cancelled</td><td>maintenance_request</td></tr>
+<tr><td>موافقة على التشخيص</td><td>العميل</td><td>فنيو الصالة (FCM+DB)</td><td>Diagnosis Approved</td><td>maintenance_request</td></tr>
+<tr><td>رفض التشخيص</td><td>العميل</td><td>فنيو الصالة (FCM+DB)</td><td>Diagnosis Rejected</td><td>maintenance_request</td></tr>
+<tr><td>إنشاء استشارة فني</td><td>العميل</td><td>كل الفنيين النشطين (FCM+DB) + الأدمن (DB)</td><td>New Consultation Request</td><td>consultation</td></tr>
+<tr><td>تغيير → under_inspection</td><td>الفني</td><td><strong>العميل (FCM+DB)</strong></td><td>Request Under Inspection</td><td>maintenance_request</td></tr>
+<tr><td>إرسال التشخيص</td><td>الفني</td><td><strong>العميل (FCM+DB)</strong></td><td>Diagnosis Ready</td><td>maintenance_request</td></tr>
+<tr><td>تغيير → completed</td><td>الفني</td><td><strong>العميل (FCM+DB)</strong></td><td>Repair Completed</td><td>maintenance_request</td></tr>
+<tr><td>الرد على استشارة</td><td>الفني</td><td><strong>العميل (FCM+DB)</strong></td><td>Consultation Answered</td><td>consultation</td></tr>
+<tr><td>تفعيل الفني</td><td>الأدمن</td><td>الفني (FCM)</td><td>Account Activated</td><td>account_status</td></tr>
+<tr><td>تعطيل الفني</td><td>الأدمن</td><td>الفني (FCM)</td><td>Account Deactivated</td><td>account_status</td></tr>
+<tr><td>تفعيل عامل التوصيل</td><td>الأدمن</td><td>عامل التوصيل (FCM)</td><td>Account Activated</td><td>account_status</td></tr>
+<tr><td>تعطيل عامل التوصيل</td><td>الأدمن</td><td>عامل التوصيل (FCM)</td><td>Account Deactivated</td><td>account_status</td></tr>
+<tr><td>إنشاء توصيلة</td><td>الأدمن</td><td><strong>العميل (FCM+DB)</strong></td><td>تم إنشاء طلب التوصيل</td><td>delivery</td></tr>
+<tr><td>قبول التوصيلة</td><td>عامل التوصيل</td><td><strong>العميل (FCM+DB)</strong></td><td>عامل التوصيل في الطريق إليك</td><td>delivery</td></tr>
+<tr><td>on_the_way</td><td>عامل التوصيل</td><td><strong>العميل (FCM+DB)</strong></td><td>عامل التوصيل في الطريق</td><td>delivery</td></tr>
+<tr><td>arrived</td><td>عامل التوصيل</td><td><strong>العميل (FCM+DB)</strong></td><td>عامل التوصيل وصل</td><td>delivery</td></tr>
+<tr><td>تأكيد التسليم</td><td>عامل التوصيل</td><td><strong>العميل (FCM+DB)</strong> + الأدمن (FCM)</td><td>تم التوصيل بنجاح</td><td>delivery</td></tr>
+<tr><td>تحصيل الكاش</td><td>عامل التوصيل</td><td>الأدمن (FCM)</td><td>Cash Collected</td><td>delivery</td></tr>
+<tr><td>إتمام checkout</td><td>العميل</td><td><strong>العميل (FCM+DB)</strong></td><td>تم إنشاء طلب التوصيل</td><td>delivery</td></tr>
+<tr><td>الموافقة على التشخيص (بعد approve)</td><td>العميل</td><td><strong>العميل (FCM+DB)</strong></td><td>تم إنشاء طلب التوصيل</td><td>delivery</td></tr>
+<tr><td>طلب تزويد مخزون</td><td>-</td><td>الأدمن (DB فقط)</td><td>Stock Request</td><td>-</td></tr>
+</table>
+<div class="info-box"><strong>لماذا هذا التصميم:</strong> قبل هذا التحديث كان العميل الوحيد بدون سجل إشعارات دائم (الفني والأدمن عندهما من قبل). أي حدث كان يصل فقط كـ Push - لو العميل ما فتح التطبيق وقتها أو ما كان مثبّت توكن FCM، يضيع الإشعار نهائياً. الآن كل الأحداث أعلاه المعلَّمة (FCM+DB) تُخزَّن بجدول notifications بعمود customer_id، فيقدر العميل يشوفها لاحقاً من GET /customer/notifications مهما صار.</div>
+
+<div class="page-break"></div>
+
+<!-- 11. Migrations -->
+<h1 id="sec-12">12. جداول قاعدة البيانات (Migrations)</h1>
+<table>
+<tr><th>التاريخ</th><th>الجدول / العملية</th><th>أبرز الأعمدة المضافة</th></tr>
+<tr><td>2026-05-14</td><td>إنشاء customers</td><td>first_name, last_name, email unique, password nullable, phone unique, birthdate</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء technicians</td><td>shop_id FK, first_name, last_name, email unique nullable, password nullable, phone unique, specialization, experience</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء shops</td><td>name, address, phone, latitude, longitude, is_active</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء maintenance_requests</td><td>tracking_number unique, customer_id FK, shop_id FK, device_model, problem_description, status, estimated_cost</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء accessories</td><td>shop_id FK, name, description, price, stock_quantity, image_url, is_active</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء cart_items</td><td>customer_id FK, accessory_id FK, quantity</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء orders</td><td>order_number unique, customer_id, shop_id, total_amount, payment_method ENUM, status</td></tr>
+<tr><td>2026-05-14</td><td>إنشاء order_items</td><td>order_id FK, accessory_id FK, quantity, unit_price</td></tr>
+<tr><td>2026-05-15</td><td>إضافة shop_id + is_active لـ technicians</td><td>shop_id FK nullable, is_active boolean default true</td></tr>
+<tr><td>2026-05-15</td><td>تعديل عمود status في maintenance_requests</td><td>ALTER TABLE MODIFY COLUMN status VARCHAR(255) ← لدعم MySQL</td></tr>
+<tr><td>2026-05-15</td><td>إنشاء spare_parts</td><td>shop_id FK, name, price, stock_quantity</td></tr>
+<tr><td>2026-05-15</td><td>إنشاء maintenance_request_parts</td><td>maintenance_request_id FK, spare_part_id FK, quantity, unit_price</td></tr>
+<tr><td>2026-05-15</td><td>إضافة estimated_days لـ maintenance_requests</td><td>estimated_days integer nullable</td></tr>
+<tr><td>2026-05-16</td><td>إنشاء consultations</td><td>customer_id FK, technician_id FK nullable, consultation_type ENUM, message, image_path, reply, status</td></tr>
+<tr><td>2026-05-16</td><td>إنشاء admins</td><td>name, email unique, password</td></tr>
+<tr><td>2026-05-16</td><td>إضافة image_path + rating لـ shops</td><td>image_path nullable, rating decimal(3,2)</td></tr>
+<tr><td>2026-05-16</td><td>إنشاء stock_requests</td><td>shop_id FK, spare_part_id FK, quantity, status ENUM(pending/approved/rejected)</td></tr>
+<tr><td>2026-06-08</td><td>إنشاء otps</td><td>phone, code(5 أرقام), is_used boolean, expires_at timestamp</td></tr>
+<tr><td>2026-06-08</td><td>customers.password → nullable</td><td>تعديل عمود password</td></tr>
+<tr><td>2026-06-08</td><td>إضافة phone_verified لـ otps</td><td>phone_verified boolean default false</td></tr>
+<tr><td>2026-06-08</td><td>تعديل maintenance_requests</td><td>customer_status, rejection_reason, payment_method ENUM</td></tr>
+<tr><td>2026-06-08</td><td>تعديل maintenance_request_parts</td><td>name, price, is_required, is_selected + spare_part_id → nullable</td></tr>
+<tr><td>2026-06-08</td><td>orders.payment_method → ENUM جديد</td><td>cash_on_delivery / pay_after_service</td></tr>
+<tr><td>2026-06-08</td><td>technicians.password → nullable</td><td>-</td></tr>
+<tr><td>2026-06-08</td><td>إضافة fcm_token</td><td>fcm_token nullable لـ customers وtechnicians</td></tr>
+<tr><td>2026-06-10</td><td>إنشاء delivery_workers</td><td>shop_id nullable, first_name, last_name, email, phone unique, password nullable, is_active, fcm_token</td></tr>
+<tr><td>2026-06-10</td><td>إنشاء deliveries</td><td>type ENUM, delivery_worker_id nullable, customer_id, shop_id, maintenance_request_id nullable, order_id nullable, status ENUM, payment_method, confirmation_code, confirmed_at, cash_collected, cash_amount</td></tr>
+<tr><td>2026-06-10</td><td>إضافة fcm_token للأدمن</td><td>fcm_token nullable في admins</td></tr>
+<tr><td>2026-06-11</td><td>حذف unit_price</td><td>DROP COLUMN unit_price من maintenance_request_parts</td></tr>
+<tr><td>2026-06-13</td><td>توسيع حالات deliveries</td><td>إضافة: picked_up, in_transit, failed, rejected</td></tr>
+<tr><td>2026-06-13</td><td>إنشاء notifications</td><td>admin_id nullable, technician_id nullable, type, title, body, data JSON, is_read boolean</td></tr>
+<tr><td>2026-06-17</td><td>technicians.email → nullable</td><td>email unique nullable</td></tr>
+<tr><td>2026-07-02</td><td>إضافة موقع لـ deliveries</td><td>latitude decimal(10,7) nullable, longitude decimal(10,7) nullable, address string nullable</td></tr>
+<tr><td>2026-07-02</td><td>إضافة last_seen_at لـ technicians</td><td>last_seen_at timestamp nullable - يُحدَّث تلقائياً بـ middleware technician.last_seen بكل request محمي</td></tr>
+<tr><td>2026-07-03</td><td>إضافة customer_id لـ notifications</td><td>customer_id FK nullable → customers, nullOnDelete</td></tr>
+</table>
+
+<div class="warn-box">قاعدة مهمة: جميع تعديلات الأعمدة تستخدم DB::statement('ALTER TABLE ... MODIFY COLUMN ...') وليس table->change()، لأن MySQL لا يدعم الأخير في Laravel 12 بدون doctrine/dbal.</div>
+
+<div class="page-break"></div>
+
+<!-- 12. اتفاقية الاستجابات -->
+<h1 id="sec-13">13. اتفاقية الاستجابات وأكواد HTTP</h1>
+
+<h2>الشكل العام لكل الاستجابات</h2>
+<div class="code">// نجاح مع بيانات
+{ "message": "تم بنجاح", "data": { ... } }
+
+// نجاح مع قائمة
+{ "message": "تم بنجاح", "data": [ ... ] }
+
+// نجاح مع Pagination
+{
+  "message": "تم بنجاح",
+  "data": {
+    "current_page": 1, "data": [...],
+    "last_page": 5, "per_page": 15, "total": 73,
+    "next_page_url": "...", "prev_page_url": null
+  }
+}
+
+// خطأ
+{ "message": "وصف الخطأ" }
+
+// خطأ التحقق (422)
+{ "message": "The given data was invalid.", "errors": { "phone": ["..."] } }</div>
+
+<h2>أكواد HTTP المستخدمة</h2>
+<table>
+<tr><th>الكود</th><th>المعنى</th><th>مثال</th></tr>
+<tr><td>200</td><td>ناجح</td><td>جلب بيانات، دخول ناجح، تحديث</td></tr>
+<tr><td>201</td><td>أُنشئ بنجاح</td><td>إنشاء طلب صيانة، تسجيل عميل جديد</td></tr>
+<tr><td>400</td><td>طلب خاطئ</td><td>السلة فارغة، مخزون غير كافٍ</td></tr>
+<tr><td>401</td><td>غير مصادَق</td><td>Token مفقود أو منتهي الصلاحية</td></tr>
+<tr><td>403</td><td>محظور</td><td>حساب موقوف، OTP غير مُتحقَّق منه</td></tr>
+<tr><td>404</td><td>غير موجود</td><td>هاتف غير مسجل، سجل غير موجود</td></tr>
+<tr><td>422</td><td>خطأ تحقق</td><td>حقل مفقود أو تنسيق خاطئ</td></tr>
+<tr><td>429</td><td>طلبات كثيرة</td><td>تجاوز حد الـ OTP (3 في 60 ثانية)</td></tr>
+</table>
+
+<h2>Pagination</h2>
+<p>كل endpoint بيانات كثيرة تُرجع 15 عنصر في الصفحة. للتنقل: GET /endpoint?page=2</p>
+
+<!-- 13. حسابات الاختبار -->
+<!-- 14. الأمان -->
+<h1 id="sec-14">14. الأمان والحماية (Security)</h1>
+
+<h2>14.1 المصادقة والتفويض</h2>
+<div class="section-box">
+<ul>
+<li><strong>Laravel Sanctum</strong> لكل الأدوار الأربعة - كل دور له Guard/Model منفصل تماماً (لا يوجد جدول users مشترك)، فمهما حصل لا يستطيع Token خاص بعميل الوصول لـ endpoint خاص بأدمن ولو حاول تغيير الـ Authorization header يدوياً - الـ middleware <code>auth:sanctum</code> يتحقق من نوع الـ Model المرتبط بالتوكن.</li>
+<li>كلمات المرور (Admin/Technician/DeliveryWorker) مخزَّنة بـ <strong>bcrypt</strong> عبر Eloquent cast <code>'password' => 'hashed'</code> - لا يوجد md5/sha1 بأي مكان.</li>
+<li>Customer/Technician/DeliveryWorker: <code>password</code> nullable لأنها لا تُستخدَم أصلاً (الدخول بـ OTP) - Technician فقط له كلمة مرور اختيارية إضافية للدخول من لوحة التحكم.</li>
+<li><strong>authorize() في كل Form Request يرجع true دائماً</strong> - هذا مقصود: التفويض (من يقدر يرى ماذا) يتم عبر منطق الكونترولر نفسه (مثال: <code>MaintenanceRequest::where('customer_id', $customer->id)</code>) وليس عبر Form Request. الفصل بين "هل البيانات صحيحة الشكل" (Form Request) و"هل يحق لهذا المستخدم الوصول لهذا السجل" (Controller) مقصود ومتعمَّد.</li>
+</ul>
+</div>
+
+<h2>14.2 حماية من الإساءة (Abuse Prevention)</h2>
+<div class="section-box">
+<ul>
+<li><strong>Rate Limiting على OTP:</strong> 3 محاولات إرسال لكل رقم هاتف كل 60 ثانية (RateLimiter مفتاحه رقم الهاتف، لا الـ IP) - يمنع OTP-bombing حتى لو المهاجم بدَّل شبكته.</li>
+<li>الـ OTP يُعلَّم <code>is_used=true</code> فور أول استخدام ناجح - لا Replay Attack.</li>
+<li>الـ OTP له صلاحية 10 دقائق فقط (expires_at) - نافذة زمنية ضيقة.</li>
+<li>حسابات الفني/عامل التوصيل الموقوفة (is_active=false) تُرفَض فوراً عند verifyOtp() قبل حتى إصدار أي Token - 403.</li>
+</ul>
+</div>
+
+<h2>14.3 حماية البيانات والمدخلات</h2>
+<div class="section-box">
+<ul>
+<li><strong>Mass Assignment Protection:</strong> كل Model يحدد <code>$fillable</code> صراحة - لا يوجد <code>$guarded = []</code> بأي مكان، فلا يقدر أحد يمرر حقل زي <code>is_active</code> أو <code>id</code> ضمن بيانات غير متوقعة ويُقبل بالخطأ.</li>
+<li><strong>SQL Injection:</strong> كل الاستعلامات عبر Eloquent/Query Builder مع Parameter Binding - الاستثناء الوحيد لـ Raw SQL هو معادلة Haversine بـ ShopService، وهي تستخدم <code>selectRaw(..., [$lat, $lon, $lat])</code> بـ placeholders (?) وليس string concatenation - آمنة.</li>
+<li><strong>رفع الملفات:</strong> كل Form Request لصور (Shop/Accessory/Consultation/Delivery confirmation) يتحقق <code>image, max:5120KB</code> - يرفض أي امتداد غير صورة قبل الوصول لـ Storage.</li>
+<li><strong>لا Secrets بالكود:</strong> كل المفاتيح الحساسة (GEMINI_API_KEYS، Firebase credentials، DB password) في .env أو storage/app/firebase-credentials.json - خارج git بالكامل (.gitignore).</li>
+</ul>
+</div>
+
+<h2>14.4 قيود معروفة بالأمان (تحتاج تحسين مستقبلاً)</h2>
+<div class="warn-box">
+<ul>
+<li><strong>Sanctum Tokens لا تنتهي صلاحيتها أبداً</strong> (expiration=null بالإعدادات الافتراضية) - لو سُرِّب توكن يبقى صالحاً للأبد حتى يُحذَف يدوياً. التحسين المقترح: تفعيل <code>'expiration' => 60*24*30</code> (شهر مثلاً) بـ config/sanctum.php.</li>
+<li><strong>لا يوجد 2FA</strong> لحسابات الأدمن (فقط Email+Password).</li>
+<li><strong>لا Audit Log</strong> لتتبع من غيَّر ماذا وقتها (فقط created_at/updated_at على مستوى السجل، بدون سجل تاريخي كامل للتغييرات).</li>
+</ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- 15. القيود المعروفة -->
+<h1 id="sec-15">15. القيود المعروفة والتحديات التقنية</h1>
+
+<h2>15.1 حظر Google Gemini API جغرافياً عن سوريا</h2>
+<div class="warn-box">
+<p><strong>المشكلة الفعلية المُكتشَفة:</strong> السيرفر مستضاف على استضافة سورية (<code>shamsung.haderin.sy</code>). عند استدعاء Gemini API مباشرة، Google يرفض الطلب بـ:</p>
+<div class="code">HTTP 400 - FAILED_PRECONDITION
+"message": "User location is not supported for the API use."</div>
+<p>هذا قيد جغرافي إلزامي من Google (متعلق بعقوبات/قيود تصدير أمريكية) - <strong>لا حل له على مستوى الكود أو إعدادات السيرفر</strong>. تأكَّدنا أن المفاتيح نفسها صحيحة وغير منتهية (تعمل 200 OK لما تُستدعى من مكان آخر خارج سوريا).</p>
+<p><strong>الحل المُطبَّق:</strong> بروكسي عبر <strong>Cloudflare Workers</strong> (مجاني) - السيرفر السوري يرسل الطلب لعنوان الـ Worker (خارج سوريا جغرافياً بحكم شبكة Cloudflare العالمية)، والـ Worker يمرره لـ Google ويرجع الرد. تفعيله عبر متغيرين اختياريين بـ .env:</p>
+<div class="code">GEMINI_PROXY_URL=https://gemini-proxy.xxx.workers.dev
+GEMINI_PROXY_SECRET=<نص سري يتحقق منه الـ Worker>
+
+// داخل ConsultationController::callGeminiApi()
+$url = $proxyUrl ? rtrim($proxyUrl,'/') . $path : "https://generativelanguage.googleapis.com{$path}";</div>
+<p>لو المتغيرين فارغين بـ .env، الكود يرجع تلقائياً للاتصال المباشر (Backward Compatible) - مفيد للتطوير المحلي خارج سوريا.</p>
+</div>
+
+<h2>15.2 تحديات أخرى</h2>
+<div class="section-box">
+<ul>
+<li><strong>استضافة مشتركة بدون Terminal/SSH:</strong> كل الأوامر (migrate، composer install، حتى فحص ملفات اللوغ) تحتاج تُنفَّذ يدوياً عبر لوحة الاستضافة (cPanel File Manager) أو تُشغَّل من بيئة محلية ثم تُرفَع الملفات يدوياً - لا CI/CD تلقائي حالياً.</li>
+<li><strong>لا Queue فعلي:</strong> QUEUE_CONNECTION=database لكن الإشعارات (FCM) تُرسَل Synchronous ضمن نفس الـ request - في حال بطء Firebase/Google يتأخر رد الـ API معه (محمي بـ try/catch فلا يفشل، لكن قد يبطّئ).</li>
+<li><strong>لا اختبارات آلية (Automated Tests) مكتوبة فعلياً حالياً</strong> رغم وجود phpunit.xml وأمر composer test جاهز - القاعدة موجودة لكن Test Cases الفعلية للـ business logic (مثال: approve()، checkout()) لم تُكتب بعد.</li>
+<li><strong>لا نموذج ربط فني↔طلب صيانة مباشر:</strong> أي فني بنفس الصالة يقدر يتعامل مع أي طلب لتلك الصالة (لا يوجد technician_id على maintenance_requests) - قرار تصميم مقصود لتوزيع العمل، لكنه يعني أن "مشغول/متاح" للفني الفردي هو تقدير على مستوى الصالة وليس دقيقاً 100% على مستوى الفرد.</li>
+</ul>
+</div>
+
+<div class="page-break"></div>
+
+<h1 id="sec-16">16. حسابات الاختبار والأوامر المهمة</h1>
+
+<h2>حسابات الاختبار</h2>
+<table>
+<tr><th>الغرض</th><th>البريد الإلكتروني</th><th>كلمة المرور</th><th>ملاحظة</th></tr>
+<tr><td>Admin</td><td>admin@shamsung.com</td><td>password123</td><td>يُنشأ بـ php artisan db:seed --class=AdminSeeder</td></tr>
+</table>
+
+<h2>الأوامر الأساسية</h2>
+<div class="code">php artisan serve                                  # تشغيل السيرفر
+php artisan migrate                                # تشغيل جميع migrations
+php artisan db:seed --class=AdminSeeder            # إنشاء حساب Admin
+php artisan storage:link                           # ربط مجلد الصور للـ public
+php artisan cache:clear                            # مسح الكاش
+./vendor/bin/pint                                  # تنسيق الكود
+composer test                                      # تشغيل Tests (يمسح config cache أولاً)</div>
+
+<h2>متغيرات البيئة المهمة (.env)</h2>
+<table>
+<tr><th>المتغير</th><th>الوصف</th></tr>
+<tr><td>APP_KEY</td><td>مفتاح التشفير - يُنشأ بـ php artisan key:generate</td></tr>
+<tr><td>APP_URL</td><td>رابط التطبيق (http://127.0.0.1:8000 محلياً)</td></tr>
+<tr><td>DB_CONNECTION / DB_HOST / DB_DATABASE / DB_USERNAME / DB_PASSWORD</td><td>إعدادات MySQL</td></tr>
+<tr><td>GEMINI_API_KEYS</td><td>مفاتيح Gemini AI مفصولة بفاصلة للـ fallback</td></tr>
+<tr><td>GEMINI_PROXY_URL / GEMINI_PROXY_SECRET</td><td>اختياري - بروكسي Cloudflare Worker لتفادي حظر Google الجغرافي (راجع القسم 15.1)</td></tr>
+<tr><td>SANCTUM_STATEFUL_DOMAINS</td><td>النطاقات المسموح بها للـ SPA</td></tr>
+<tr><td>FILESYSTEM_DISK</td><td>local - الصور تُحفظ في storage/app/public</td></tr>
+<tr><td>QUEUE_CONNECTION</td><td>database - للـ jobs والـ notifications</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<!-- 17. أسئلة المناقشة -->
+<h1 id="sec-17">17. أسئلة المناقشة المتوقعة (Viva) وإجاباتها</h1>
+<p>هذه الأسئلة مبنية على القرارات التصميمية الفعلية بالمشروع - الإجابة الجيدة تشرح <strong>لماذا</strong> اتُّخذ القرار، مو بس تعيد وصف الكود.</p>
+
+<h2>17.1 أسئلة معمارية عامة</h2>
+
+<h3>س: ليش REST API منفصل تماماً عن الواجهة بدل Laravel Blade التقليدي؟</h3>
+<div class="section-box">ج: المشروع يخدم 3 عملاء مختلفين تماماً بنفس الوقت: تطبيقات موبايل (iOS/Android) ولوحة تحكم React منفصلة. REST API + JSON هو القاسم المشترك الوحيد بينهم - أي واجهة عرض (Blade) كانت رح تخدم واحد منهم بس وتحتاج تُبنى إضافياً. الفصل الكامل بين الـ Backend (API) والـ Frontend يسمح لكل فريق يشتغل ويُطوَّر بشكل مستقل تماماً.</div>
+
+<h3>س: ليش 4 أدوار بـ Guards منفصلة بدل جدول users واحد مع عمود role؟</h3>
+<div class="section-box">ج: كل دور له حقول وسلوك مختلف جذرياً (العميل بلا كلمة مرور أصلاً، الفني له shop_id إلزامي، الأدمن بلا OTP إطلاقاً). جدول واحد بعمود role كان سيحتاج عشرات الأعمدة nullable حسب الدور (denormalization سيئة) وتحقق شرطي معقد بكل مكان ("لو role=customer تحقق كذا..."). الفصل لجداول/Models منفصلة أوضح، وأهم من هيك: يمنع تماماً احتمال تسرّب صلاحيات بين الأدوار (توكن عميل لا يمكن نظرياً أن يُقرأ كتوكن أدمن، لأنهم من نموذج مختلف بالكامل من ناحية Sanctum).</div>
+
+<h3>س: ليش Sanctum وليس Passport أو JWT يدوي؟</h3>
+<div class="section-box">ج: Passport مصمَّم لـ OAuth2 الكامل (مفيد لما يكون في third-party apps تتصل بواجهتك) - overkill هون لأن العميل والـ Frontend كلاهما "أول طرف" (first-party). Sanctum أخف وأبسط، ويدعم بالضبط الحاجة: token واحد بسيط لكل جهاز/جلسة، مربوط مباشرة بالـ Model عبر HasApiTokens trait، بدون تعقيد إضافي.</div>
+
+<h2>17.2 أسئلة عن قرارات تصميم محددة</h2>
+
+<h3>س: ليش فيه status وcustomer_status منفصلين بطلب الصيانة؟</h3>
+<div class="section-box">ج: status يمثّل الحالة "الفنية/الداخلية" الحقيقية (pending, under_inspection...) التي يفهمها الفني والنظام. customer_status يمثّل "ماذا يجب أن يرى العميل تحديداً" (pending_approval, approved, rejected) - وهي أبسط وأقل تفصيلاً. هذا يفصل منطق سير العمل الداخلي عن تجربة عرضه للمستخدم النهائي، ويسمح مستقبلاً بتغيير إحداهما بدون كسر الأخرى.</div>
+
+<h3>س: ليش القطع (parts) تُنسَخ (name, price) من SparePart بدل الاكتفاء بـ Foreign Key؟</h3>
+<div class="section-box">ج: هذا نمط "Snapshot/Denormalization" مقصود. سعر القطعة بكتالوج SparePart قابل للتغيير لاحقاً (الأدمن يقدر يعدّل الأسعار). لو الطلب اكتفى بـ spare_part_id فقط، وتغيَّر السعر لاحقاً، سيظهر سعر مختلف بفاتورة/تشخيص قديم عن السعر وقت إنشائه فعلياً - وهذا خطأ محاسبي. النسخ وقت التشخيص (diagnose()) يجمّد السعر والاسم كما كانا في تلك اللحظة بالضبط، بغض النظر عن أي تغيير لاحق بالكتالوج.</div>
+
+<h3>س: ليش checkout() ينشئ طلبية منفصلة لكل صالة بدل طلبية واحدة؟</h3>
+<div class="section-box">ج: كل صالة (Shop) هي كيان تشغيلي مستقل (له مخزونه، فريق توصيله الخاص). لو العميل اشترى من صالتين بنفس السلة، كل صالة يجب تشحن/تجهّز طلبها بشكل مستقل تماماً - فصل الطلبية يعكس هذا الواقع التشغيلي، ويسمح لكل صالة تتبع طلبيتها وتحصيلها المالي بمعزل عن الأخرى.</div>
+
+<h3>س: ليش الموقع الجغرافي (lat/long) بيُنسَخ على جدول deliveries وليس على maintenance_requests أو orders نفسها؟</h3>
+<div class="section-box">ج: الموقع مطلوب فقط باللحظة يلي حدا رح يتحرك فيزيائياً لعند العميل (delivery)، مش وقت تقديم الطلب نفسه (اللي ممكن ياخد أيام لحتى يوصل لمرحلة التوصيل). ربطه بجدول deliveries يخليه يتسجل بأحدث لحظة ممكنة (approve()/checkout()) بدل تخزينه بدري وقد يصير قديم/غير دقيق وقت التوصيل الفعلي، وبنفس الوقت ما بيكرر الحقل بجداول ثانية ما إلها علاقة مباشرة بالتوصيل.</div>
+
+<h3>س: ليش نقل estimated_time من الأدمن إلى عامل التوصيل نفسه؟</h3>
+<div class="section-box">ج: الأدمن وقت إنشاء التوصيلة ما بعرف مين رح ياخدها ولا وين هو جغرافياً - أي رقم يحطه تخمين عشوائي. عامل التوصيل هو الوحيد يلي بيعرف فعلياً موقعه الحالي وظروف الطريق لحظة قبوله الطلب، فتقديره أدق بكثير. هذا مثال على مبدأ "أقرب شخص للمعلومة هو يلي لازم يوفرها" (Single Source of Truth بأقرب نقطة ممكنة للواقع).</div>
+
+<h2>17.3 أسئلة عن الأداء وقابلية التوسع</h2>
+
+<h3>س: كيف بتضمن ما يصير Race Condition بخصم المخزون (stock_quantity) لو طلبين إجو بنفس اللحظة؟</h3>
+<div class="section-box">ج: العملية محاطة بـ DB::transaction()، واستخدام <code>decrement()</code> بـ Eloquent يترجم لـ SQL يشبه <code>UPDATE ... SET stock_quantity = stock_quantity - X</code> - وهو atomic على مستوى قاعدة البيانات نفسها (MySQL يقفل الصف أثناء التحديث). <strong>نقطة تحسين ممكنة مستقبلاً:</strong> إضافة تحقق صريح <code>WHERE stock_quantity >= X</code> ضمن نفس الاستعلام (بدل تحقق منفصل قبل الـ decrement) لمنع negative stock بشكل مضمون 100% تحت ضغط عالٍ جداً من الطلبات المتزامنة.</div>
+
+<h3>س: ليش معادلة المسافة (Haversine) بـ Raw SQL بدل مكتبة GIS؟</h3>
+<div class="section-box">ج: MySQL Spatial Extensions (ST_Distance_Sphere مثلاً) تحتاج أعمدة من نوع خاص (POINT) وإعداد إضافي غير موجود بالبنية الحالية. لعدد صالات محدود (عشرات وليس ملايين)، معادلة Haversine بـ selectRaw كافية جداً من ناحية الأداء وأبسط بالتطبيق - لا حاجة لتعقيد إضافي غير مبرَّر بحجم البيانات الحالي (YAGNI - You Aren't Gonna Need It).</div>
+
+<h3>س: شو أكبر نقطة ضعف بالأداء حالياً؟</h3>
+<div class="section-box">ج: إرسال FCM بشكل متزامن (Synchronous) ضمن نفس الـ request بدل استخدام Queue فعلي - لو تأخرت Google/Firebase حتى بضع ثوانٍ، يتأخر رد الـ API كامل معها رغم إنو العملية الأساسية (مثلاً إنشاء الطلب) خلصت فعلياً. الحل: تفعيل Job/Queue حقيقي لإرسال الإشعارات بشكل غير متزامن تماماً.</div>
+
+<h2>17.4 أسئلة عامة متوقعة بأي مناقشة تخرج</h2>
+
+<h3>س: شو الفرق بين المتطلبات الوظيفية وغير الوظيفية بمشروعك؟ عطيني مثال من الكود نفسه.</h3>
+<div class="section-box">ج: وظيفي = "شو بيعمل النظام" (مثال: العميل يقدر يقدّم طلب صيانة - MaintenanceRequestController::store). غير وظيفي = "كيف بيعمله بجودة/بشكل صحيح" (مثال: نفس العملية محمية بـ DB::transaction عشان الموثوقية، ومحدودة الحقول المسموحة عبر Form Request عشان الأمان، ومُرقَّمة صفحات (pagination) عشان الأداء). تفصيل كامل بالقسم 2.</div>
+
+<h3>س: لو عندك أسبوع بس تحسّن شي واحد بالمشروع، شو بتختار وليش؟</h3>
+<div class="section-box">ج: (إجابة مقترحة، عدّلها حسب رأيك الشخصي) تفعيل Queue حقيقي للإشعارات (FCM) - لأنه أعلى تأثير مباشر على تجربة المستخدم والأداء بأقل تغيير هيكلي بالكود (الـ FcmService جاهز أصلاً، بس المطلوب لفّه بـ Job بدل الاستدعاء المباشر).</div>
+
+<h3>س: كيف بتتأكد إنو التعديل يلي عملتو ما كسر شي تاني بالنظام؟</h3>
+<div class="section-box">ج: (حسب الحالة الفعلية بهذا المشروع) فحص syntax لكل ملف PHP معدَّل (php -l)، تشغيل الـ migrations الجديدة فعلياً والتأكد إنها Nullable/آمنة على بيانات موجودة، ثم اختبار الـ endpoint المتأثر يدوياً عبر Postman مع أمثلة نجاح وفشل موثّقة بالـ Collection. <strong>نقطة نقص حالية يجب ذكرها بصدق:</strong> لا يوجد Test Suite آلي كامل - الاعتماد حالياً على فحص يدوي، وهذا قيد معروف (راجع 15.2).</div>
+
+</body>
+</html>

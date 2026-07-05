@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Technician extends Authenticatable
@@ -25,6 +26,11 @@ class Technician extends Authenticatable
         'experience',
         'is_active',
         'fcm_token',
+        'last_seen_at',
+    ];
+
+    protected $appends = [
+        'is_online',
     ];
 
     protected $hidden = [
@@ -34,14 +40,23 @@ class Technician extends Authenticatable
     protected function casts(): array
     {
         return [
-            'birthdate' => 'date',
-            'is_active' => 'boolean',
-            'password'  => 'hashed',
+            'birthdate'    => 'date',
+            'is_active'    => 'boolean',
+            'password'     => 'hashed',
+            'last_seen_at' => 'datetime',
         ];
     }
 
     public function shop(): BelongsTo
     {
         return $this->belongsTo(Shop::class);
+    }
+
+    public function isOnline(): Attribute
+    {
+        return Attribute::get(
+            fn () => $this->last_seen_at !== null
+                && $this->last_seen_at->gt(now()->subMinutes(5))
+        );
     }
 }

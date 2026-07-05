@@ -18,7 +18,7 @@ class StoreTechnicianRequest extends FormRequest
         return [
             'first_name'     => ['required', 'string', 'max:255'],
             'last_name'      => ['required', 'string', 'max:255'],
-            'phone'          => ['required', 'string', 'max:20', 'unique:technicians,phone'],
+            'phone'          => ['required', 'string', 'regex:/^\+963[0-9]{9}$/', 'unique:technicians,phone'],
             'email'          => ['nullable', 'email', 'unique:technicians,email'],
             'shop_id'        => ['required', 'integer', 'exists:shops,id'],
             'specialization' => ['required', 'string', 'max:255'],

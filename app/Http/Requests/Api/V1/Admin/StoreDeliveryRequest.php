@@ -19,12 +19,14 @@ class StoreDeliveryRequest extends FormRequest
             'type'                   => ['required', 'string', 'in:device_pickup,device_dropoff,accessory_delivery'],
             'customer_id'            => ['required', 'integer', 'exists:customers,id'],
             'shop_id'                => ['required', 'integer', 'exists:shops,id'],
+            'latitude'               => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude'              => ['nullable', 'numeric', 'between:-180,180'],
+            'address'                => ['nullable', 'string', 'max:255'],
             'maintenance_request_id' => ['nullable', 'integer', 'exists:maintenance_requests,id'],
             'order_id'               => ['nullable', 'integer', 'exists:orders,id'],
             'delivery_worker_id'     => ['nullable', 'integer', 'exists:delivery_workers,id'],
             'payment_method'         => ['nullable', 'string', 'in:cash_on_delivery,prepaid'],
             'notes'                  => ['nullable', 'string'],
-            'estimated_time'         => ['nullable', 'date'],
         ];
     }
 }

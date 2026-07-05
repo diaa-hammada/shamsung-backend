@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Technician;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Technician\ReplyConsultationRequest;
 use App\Models\Consultation;
+use App\Models\Notification;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,13 +43,23 @@ class ConsultationController extends Controller
             'status'        => 'answered',
         ]);
 
-        if ($consultation->customer?->fcm_token) {
-            $this->fcm->send(
-                $consultation->customer->fcm_token,
-                'Consultation Answered',
-                'A technician has replied to your question.',
-                ['type' => 'consultation', 'id' => (string) $consultation->id],
-            );
+        if ($consultation->customer) {
+            if ($consultation->customer->fcm_token) {
+                $this->fcm->send(
+                    $consultation->customer->fcm_token,
+                    'Consultation Answered',
+                    'A technician has replied to your question.',
+                    ['type' => 'consultation', 'id' => (string) $consultation->id],
+                );
+            }
+
+            Notification::create([
+                'customer_id' => $consultation->customer_id,
+                'type'        => 'consultation',
+                'title'       => 'Consultation Answered',
+                'body'        => 'A technician has replied to your question.',
+                'data'        => ['consultation_id' => $consultation->id],
+            ]);
         }
 
         return response()->json([

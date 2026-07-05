@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Order\CheckoutRequest;
 use App\Models\Delivery;
+use App\Models\Notification;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@ class OrderController extends Controller
     {
         /** @var \App\Models\Customer $customer */
         $customer = auth()->user();
-        $cartItems = $customer->cartItems()->with('accessory')->get();
+        $cartItems = $customer->cartItems()->with('accessory.shop')->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json(['message' => 'Your cart is empty'], 400);
@@ -36,6 +37,10 @@ class OrderController extends Controller
                 $createdOrders = [];
 
                 foreach ($groupedCartItems as $shopId => $items) {
+                    if (! $items->first()->accessory->shop?->is_active) {
+                        throw new Exception("Shop for item '{$items->first()->accessory->name}' is currently unavailable.");
+                    }
+
                     $totalAmount = $items->sum(function ($item) {
                         return $item->quantity * $item->accessory->price;
                     });
@@ -66,6 +71,9 @@ class OrderController extends Controller
                         'status'         => 'pending',
                         'customer_id'    => $customer->id,
                         'shop_id'        => $shopId,
+                        'latitude'       => $request->validated('latitude'),
+                        'longitude'      => $request->validated('longitude'),
+                        'address'        => $request->validated('address'),
                         'order_id'       => $order->id,
                         'payment_method' => $request->validated('payment_method') === 'cash_on_delivery'
                                                ? 'cash_on_delivery'
@@ -90,6 +98,14 @@ class OrderController extends Controller
                     );
                 }
             } catch (\Throwable) {}
+
+            Notification::create([
+                'customer_id' => $customer->id,
+                'type'        => 'delivery',
+                'title'       => 'تم إنشاء طلب التوصيل',
+                'body'        => 'سيتم توصيل طلبك قريباً.',
+                'data'        => [],
+            ]);
 
             return response()->json([
                 'message' => 'Checkout completed successfully',

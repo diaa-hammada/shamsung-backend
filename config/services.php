@@ -19,7 +19,9 @@ return [
     ],
     
     'gemini' => [
-        'keys' => env('GEMINI_API_KEYS'),
+        'keys'         => env('GEMINI_API_KEYS'),
+        'proxy_url'    => env('GEMINI_PROXY_URL'),
+        'proxy_secret' => env('GEMINI_PROXY_SECRET'),
     ],
 
     'resend' => [

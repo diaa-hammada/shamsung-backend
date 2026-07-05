@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Admin\StoreTechnicianRequest;
 use App\Http\Requests\Api\V1\Admin\UpdateTechnicianRequest;
+use App\Models\MaintenanceRequest;
 use App\Models\Technician;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +20,16 @@ class TechnicianController extends Controller
     public function index(): JsonResponse
     {
         $technicians = Technician::with('shop:id,name')->latest()->paginate(15);
+
+        $busyShopIds = MaintenanceRequest::whereIn('status', MaintenanceRequest::ACTIVE_STATUSES)
+            ->pluck('shop_id')
+            ->unique();
+
+        $technicians->getCollection()->transform(function (Technician $technician) use ($busyShopIds) {
+            $technician->full_name = trim($technician->first_name . ' ' . $technician->last_name);
+            $technician->is_busy   = $busyShopIds->contains($technician->shop_id);
+            return $technician;
+        });
 
         return response()->json([
             'message' => 'Technicians retrieved successfully',

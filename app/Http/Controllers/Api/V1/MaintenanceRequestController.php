@@ -28,23 +28,32 @@ class MaintenanceRequestController extends Controller
         $customer           = $request->user();
         $maintenanceRequest = $customer->maintenanceRequests()->create($request->validated());
 
+        $customerName = trim($customer->first_name . ' ' . $customer->last_name);
+        $deviceModel  = $request->validated('device_model');
+
         $this->notifyShopTechnicians(
             $maintenanceRequest->shop_id,
-            'New Maintenance Request',
-            'A new device repair request has been submitted.',
+            'طلب صيانة جديد',
+            "طلب صيانة جديد لجهاز {$deviceModel} من {$customerName} بانتظار الفحص",
             ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
         );
 
-        $customerName = trim($customer->first_name . ' ' . $customer->last_name);
-        $deviceModel  = $request->validated('device_model');
-        Admin::all()->each(function (Admin $admin) use ($maintenanceRequest, $customerName, $deviceModel) {
+        $adminTitle = 'طلب صيانة جديد';
+        $adminBody  = "قدّم {$customerName} طلب صيانة لجهاز {$deviceModel}";
+        $adminData  = ['type' => 'new_maintenance_request', 'id' => (string) $maintenanceRequest->id];
+
+        Admin::all()->each(function (Admin $admin) use ($maintenanceRequest, $adminTitle, $adminBody, $adminData) {
             Notification::create([
                 'admin_id' => $admin->id,
                 'type'     => 'new_maintenance_request',
-                'title'    => 'طلب صيانة جديد',
-                'body'     => "قدّم {$customerName} طلب صيانة لجهاز {$deviceModel}",
+                'title'    => $adminTitle,
+                'body'     => $adminBody,
                 'data'     => ['request_id' => $maintenanceRequest->id, 'shop_id' => $maintenanceRequest->shop_id],
             ]);
+
+            if ($admin->fcm_token) {
+                $this->fcm->send($admin->fcm_token, $adminTitle, $adminBody, $adminData);
+            }
         });
 
         return response()->json([
@@ -115,8 +124,8 @@ class MaintenanceRequestController extends Controller
 
         $this->notifyShopTechnicians(
             $maintenanceRequest->shop_id,
-            'Request Cancelled',
-            'The customer has cancelled their maintenance request.',
+            'تم إلغاء طلب الصيانة',
+            'قام العميل بإلغاء طلب الصيانة الخاص به.',
             ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
         );
 
@@ -181,6 +190,9 @@ class MaintenanceRequestController extends Controller
                 'status'                 => 'pending',
                 'customer_id'            => $maintenanceRequest->customer_id,
                 'shop_id'                => $maintenanceRequest->shop_id,
+                'latitude'               => $request->validated('latitude'),
+                'longitude'              => $request->validated('longitude'),
+                'address'                => $request->validated('address'),
                 'maintenance_request_id' => $maintenanceRequest->id,
                 'payment_method'         => $request->validated('payment_method') === 'cash_on_delivery'
                                                 ? 'cash_on_delivery'
@@ -199,10 +211,18 @@ class MaintenanceRequestController extends Controller
             }
         } catch (\Throwable) {}
 
+        Notification::create([
+            'customer_id' => $customer->id,
+            'type'        => 'delivery',
+            'title'       => 'تم إنشاء طلب التوصيل',
+            'body'        => 'سيتم توصيل طلبك قريباً.',
+            'data'        => ['request_id' => $maintenanceRequest->id],
+        ]);
+
         $this->notifyShopTechnicians(
             $maintenanceRequest->shop_id,
-            'Diagnosis Approved',
-            'The customer has approved the diagnosis. Repair can begin.',
+            'تمت الموافقة على التشخيص',
+            'وافق العميل على التشخيص. يمكن البدء بالإصلاح.',
             ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
         );
 
@@ -228,8 +248,8 @@ class MaintenanceRequestController extends Controller
 
         $this->notifyShopTechnicians(
             $maintenanceRequest->shop_id,
-            'Diagnosis Rejected',
-            'The customer has rejected the diagnosis.',
+            'تم رفض التشخيص',
+            'قام العميل برفض التشخيص المقترح.',
             ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
         );
 
@@ -243,11 +263,21 @@ class MaintenanceRequestController extends Controller
 
     private function notifyShopTechnicians(int $shopId, string $title, string $body, array $data): void
     {
-        $tokens = Technician::where('shop_id', $shopId)
-            ->whereNotNull('fcm_token')
-            ->pluck('fcm_token')
-            ->toArray();
+        $technicians = Technician::where('shop_id', $shopId)->get(['id', 'fcm_token']);
 
+        // In-app (DB) notifications — power the dashboard bell regardless of FCM token.
+        $technicians->each(function (Technician $tech) use ($title, $body, $data) {
+            Notification::create([
+                'technician_id' => $tech->id,
+                'type'          => $data['type'] ?? 'maintenance_request',
+                'title'         => $title,
+                'body'          => $body,
+                'data'          => $data,
+            ]);
+        });
+
+        // FCM push — only reaches devices that registered a token.
+        $tokens = $technicians->whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
         $this->fcm->sendMultiple($tokens, $title, $body, $data);
     }
 }

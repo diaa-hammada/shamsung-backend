@@ -12,6 +12,7 @@ class Notification extends Model
     protected $fillable = [
         'admin_id',
         'technician_id',
+        'customer_id',
         'type',
         'title',
         'body',
@@ -35,5 +36,10 @@ class Notification extends Model
     public function technician(): BelongsTo
     {
         return $this->belongsTo(Technician::class);
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
 }

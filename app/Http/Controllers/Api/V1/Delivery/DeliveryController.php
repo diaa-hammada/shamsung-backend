@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\V1\Delivery;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Delivery\AcceptDeliveryRequest;
 use App\Http\Requests\Api\V1\Delivery\CollectCashRequest;
 use App\Http\Requests\Api\V1\Delivery\ConfirmDeliveryRequest;
 use App\Http\Requests\Api\V1\Delivery\UpdateDeliveryStatusRequest;
 use App\Models\Admin;
 use App\Models\Delivery;
+use App\Models\Notification;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,7 +34,7 @@ class DeliveryController extends Controller
             ->whereNull('delivery_worker_id')
             ->with([
                 'customer:id,first_name,last_name,phone',
-                'shop:id,name,address',
+                'shop:id,name,address,latitude,longitude',
             ])
             ->latest()
             ->get();
@@ -44,7 +46,7 @@ class DeliveryController extends Controller
     }
 
     // 2. POST /delivery/requests/{id}/accept
-    public function accept(Request $request, int $id): JsonResponse
+    public function accept(AcceptDeliveryRequest $request, int $id): JsonResponse
     {
         $worker = $request->user();
 
@@ -56,6 +58,7 @@ class DeliveryController extends Controller
         $delivery->update([
             'delivery_worker_id' => $worker->id,
             'status'             => 'accepted',
+            'estimated_time'     => $request->validated('estimated_time'),
         ]);
 
         try {
@@ -68,6 +71,16 @@ class DeliveryController extends Controller
                 );
             }
         } catch (\Throwable) {}
+
+        if ($delivery->customer_id) {
+            Notification::create([
+                'customer_id' => $delivery->customer_id,
+                'type'        => 'delivery',
+                'title'       => 'عامل التوصيل في الطريق إليك',
+                'body'        => 'تم قبول طلب التوصيل الخاص بك.',
+                'data'        => ['delivery_id' => $delivery->id],
+            ]);
+        }
 
         return response()->json([
             'message' => 'Delivery request accepted successfully',
@@ -105,7 +118,7 @@ class DeliveryController extends Controller
             })
             ->with([
                 'customer:id,first_name,last_name,phone',
-                'shop:id,name,address',
+                'shop:id,name,address,latitude,longitude',
                 'maintenanceRequest',
                 'order',
             ])
@@ -153,6 +166,16 @@ class DeliveryController extends Controller
             }
         } catch (\Throwable) {}
 
+        if ($title && $delivery->customer_id) {
+            Notification::create([
+                'customer_id' => $delivery->customer_id,
+                'type'        => 'delivery',
+                'title'       => $title,
+                'body'        => $body,
+                'data'        => ['delivery_id' => $delivery->id],
+            ]);
+        }
+
         return response()->json([
             'message' => 'Delivery status updated successfully',
             'data'    => $delivery,
@@ -195,6 +218,16 @@ class DeliveryController extends Controller
                 );
             }
         } catch (\Throwable) {}
+
+        if ($delivery->customer_id) {
+            Notification::create([
+                'customer_id' => $delivery->customer_id,
+                'type'        => 'delivery',
+                'title'       => 'تم التوصيل بنجاح',
+                'body'        => 'تم توصيل طلبك بنجاح.',
+                'data'        => ['delivery_id' => $delivery->id],
+            ]);
+        }
 
         try {
             $adminTokens = Admin::whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
@@ -266,7 +299,7 @@ class DeliveryController extends Controller
         $deliveries = Delivery::where('delivery_worker_id', $worker->id)
             ->with([
                 'customer:id,first_name,last_name,phone',
-                'shop:id,name',
+                'shop:id,name,address,latitude,longitude',
             ])
             ->latest()
             ->paginate(15);

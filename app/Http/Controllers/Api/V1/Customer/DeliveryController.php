@@ -17,7 +17,7 @@ class DeliveryController extends Controller
         $deliveries = Delivery::where('customer_id', $customer->id)
             ->with([
                 'deliveryWorker:id,first_name,last_name',
-                'shop:id,name',
+                'shop:id,name,address,latitude,longitude',
             ])
             ->latest()
             ->paginate(15);
@@ -35,7 +35,7 @@ class DeliveryController extends Controller
         $delivery = Delivery::where('customer_id', $customer->id)
             ->with([
                 'deliveryWorker:id,first_name,last_name',
-                'shop:id,name',
+                'shop:id,name,address,latitude,longitude',
             ])
             ->findOrFail($id);
 
@@ -46,6 +46,9 @@ class DeliveryController extends Controller
                 'type'            => $delivery->type,
                 'status'          => $delivery->status,
                 'estimated_time'  => $delivery->estimated_time,
+                'latitude'        => $delivery->latitude,
+                'longitude'       => $delivery->longitude,
+                'address'         => $delivery->address,
                 'delivery_worker' => $delivery->deliveryWorker
                     ? ['name' => $delivery->deliveryWorker->first_name . ' ' . $delivery->deliveryWorker->last_name]
                     : null,

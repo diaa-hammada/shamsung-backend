@@ -13,6 +13,8 @@ class MaintenanceRequest extends Model
 {
     use HasFactory;
 
+    public const ACTIVE_STATUSES = ['pending', 'under_inspection', 'waiting_customer_approval', 'approved'];
+
     protected $fillable = [
         'tracking_number',
         'customer_id',

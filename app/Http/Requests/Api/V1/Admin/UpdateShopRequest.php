@@ -21,6 +21,8 @@ class UpdateShopRequest extends FormRequest
             'phone'     => ['sometimes', 'required', 'string', 'max:20'],
             'latitude'  => ['sometimes', 'required', 'numeric'],
             'longitude' => ['sometimes', 'required', 'numeric'],
+            'rating'    => ['sometimes', 'nullable', 'numeric', 'min:0', 'max:5'],
+            'is_active' => ['sometimes', 'boolean'],
             'image'     => ['nullable', 'image', 'max:5120'],
         ];
     }

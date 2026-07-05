@@ -56,21 +56,39 @@ class AdminDeliveryController extends Controller
             }
         } catch (\Throwable) {}
 
+        if ($delivery->customer_id) {
+            Notification::create([
+                'customer_id' => $delivery->customer_id,
+                'type'        => 'delivery',
+                'title'       => 'تم إنشاء طلب التوصيل',
+                'body'        => 'سيتم توصيل طلبك قريباً.',
+                'data'        => ['delivery_id' => $delivery->id],
+            ]);
+        }
+
         $customerName = $delivery->customer
             ? trim($delivery->customer->first_name . ' ' . $delivery->customer->last_name)
             : 'عميل';
 
-        Admin::all()->each(function (Admin $admin) use ($delivery, $customerName, $validated) {
+        $adminTitle = 'توصيلة جديدة';
+        $adminBody  = "تم إنشاء توصيلة {$validated['type']} للعميل {$customerName}";
+        $adminData  = ['type' => 'new_delivery', 'id' => (string) $delivery->id];
+
+        Admin::all()->each(function (Admin $admin) use ($delivery, $customerName, $adminTitle, $adminBody, $adminData) {
             Notification::create([
                 'admin_id' => $admin->id,
                 'type'     => 'new_delivery',
-                'title'    => 'توصيلة جديدة',
-                'body'     => "تم إنشاء توصيلة {$validated['type']} للعميل {$customerName}",
+                'title'    => $adminTitle,
+                'body'     => $adminBody,
                 'data'     => [
                     'delivery_id' => $delivery->id,
                     'customer_id' => $delivery->customer_id,
                 ],
             ]);
+
+            if ($admin->fcm_token) {
+                $this->fcm->send($admin->fcm_token, $adminTitle, $adminBody, $adminData);
+            }
         });
 
         return response()->json([

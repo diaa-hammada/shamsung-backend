@@ -21,6 +21,8 @@ class StoreShopRequest extends FormRequest
             'phone'     => ['required', 'string', 'max:20'],
             'latitude'  => ['required', 'numeric'],
             'longitude' => ['required', 'numeric'],
+            'rating'    => ['nullable', 'numeric', 'min:0', 'max:5'],
+            'is_active' => ['nullable', 'boolean'],
             'image'     => ['nullable', 'image', 'max:5120'],
         ];
     }

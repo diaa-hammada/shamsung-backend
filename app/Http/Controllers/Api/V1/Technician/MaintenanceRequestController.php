@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Technician\DiagnoseRequest;
 use App\Http\Requests\Api\V1\Technician\UpdateStatusRequest;
 use App\Models\MaintenanceRequest;
+use App\Models\Notification;
 use App\Models\SparePart;
 use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
@@ -70,13 +71,23 @@ class MaintenanceRequestController extends Controller
             default => [null, null],
         };
 
-        if ($title && $maintenanceRequest->customer?->fcm_token) {
-            $this->fcm->send(
-                $maintenanceRequest->customer->fcm_token,
-                $title,
-                $body,
-                ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
-            );
+        if ($title && $maintenanceRequest->customer) {
+            if ($maintenanceRequest->customer->fcm_token) {
+                $this->fcm->send(
+                    $maintenanceRequest->customer->fcm_token,
+                    $title,
+                    $body,
+                    ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
+                );
+            }
+
+            Notification::create([
+                'customer_id' => $maintenanceRequest->customer_id,
+                'type'        => 'maintenance_request',
+                'title'       => $title,
+                'body'        => $body,
+                'data'        => ['request_id' => $maintenanceRequest->id],
+            ]);
         }
 
         return response()->json([
@@ -116,13 +127,23 @@ class MaintenanceRequestController extends Controller
             ]);
         });
 
-        if ($maintenanceRequest->customer?->fcm_token) {
-            $this->fcm->send(
-                $maintenanceRequest->customer->fcm_token,
-                'Diagnosis Ready',
-                'Your device has been diagnosed. Please review the parts and approve.',
-                ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
-            );
+        if ($maintenanceRequest->customer) {
+            if ($maintenanceRequest->customer->fcm_token) {
+                $this->fcm->send(
+                    $maintenanceRequest->customer->fcm_token,
+                    'Diagnosis Ready',
+                    'Your device has been diagnosed. Please review the parts and approve.',
+                    ['type' => 'maintenance_request', 'id' => (string) $maintenanceRequest->id],
+                );
+            }
+
+            Notification::create([
+                'customer_id' => $maintenanceRequest->customer_id,
+                'type'        => 'maintenance_request',
+                'title'       => 'Diagnosis Ready',
+                'body'        => 'Your device has been diagnosed. Please review the parts and approve.',
+                'data'        => ['request_id' => $maintenanceRequest->id],
+            ]);
         }
 
         return response()->json([

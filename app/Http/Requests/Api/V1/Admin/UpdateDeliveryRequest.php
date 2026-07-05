@@ -18,6 +18,9 @@ class UpdateDeliveryRequest extends FormRequest
         return [
             'delivery_worker_id' => ['nullable', 'integer', 'exists:delivery_workers,id'],
             'status'             => ['nullable', 'string', 'in:pending,accepted,picked_up,in_transit,delivered,failed,rejected'],
+            'latitude'           => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude'          => ['nullable', 'numeric', 'between:-180,180'],
+            'address'            => ['nullable', 'string', 'max:255'],
         ];
     }
 }

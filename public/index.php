@@ -5,6 +5,14 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
+// Fix for servers where cURL is compiled without TLS 1.2 constant
+if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+    define('CURL_SSLVERSION_TLSv1_2', 7);
+}
+if (!defined('CURL_SSLVERSION_TLSv1_3')) {
+    define('CURL_SSLVERSION_TLSv1_3', 8);
+}
+
 // Determine if the application is in maintenance mode...
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;

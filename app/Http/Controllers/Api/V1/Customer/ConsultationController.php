@@ -13,6 +13,7 @@ use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class ConsultationController extends Controller
 {
@@ -100,8 +101,10 @@ class ConsultationController extends Controller
             return 'AI service is currently unavailable (Missing API Keys).';
         }
 
-        $apiKeys = explode(',', $keysString);
-        $models  = ['gemini-2.5-flash-lite', 'gemini-flash-latest'];
+        $apiKeys    = explode(',', $keysString);
+        $models     = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
+        $proxyUrl   = config('services.gemini.proxy_url');
+        $proxySecret = config('services.gemini.proxy_secret');
 
         $parts = [];
         if ($imageBase64) {
@@ -124,10 +127,16 @@ class ConsultationController extends Controller
             $apiKey = trim($apiKey);
             foreach ($models as $modelName) {
                 try {
-                    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
+                    $path = "/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
+                    $url  = $proxyUrl ? rtrim($proxyUrl, '/') . $path : "https://generativelanguage.googleapis.com{$path}";
 
-                    $response = Http::withHeaders(['Content-Type' => 'application/json'])
-                        ->timeout(15)
+                    $headers = ['Content-Type' => 'application/json'];
+                    if ($proxyUrl && $proxySecret) {
+                        $headers['X-Proxy-Secret'] = $proxySecret;
+                    }
+
+                    $response = Http::withHeaders($headers)
+                        ->timeout(30)
                         ->post($url, $requestBody);
 
                     if ($response->successful()) {
@@ -135,8 +144,23 @@ class ConsultationController extends Controller
                         if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
                             return $data['candidates'][0]['content']['parts'][0]['text'];
                         }
+
+                        Log::warning('Gemini API: unexpected response shape', [
+                            'model' => $modelName,
+                            'body'  => $response->body(),
+                        ]);
+                    } else {
+                        Log::warning('Gemini API: non-successful response', [
+                            'model'  => $modelName,
+                            'status' => $response->status(),
+                            'body'   => $response->body(),
+                        ]);
                     }
-                } catch (\Exception) {
+                } catch (\Exception $e) {
+                    Log::error('Gemini API: request exception', [
+                        'model'   => $modelName,
+                        'message' => $e->getMessage(),
+                    ]);
                     continue;
                 }
             }

@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Admin\StoreShopRequest;
 use App\Http\Requests\Api\V1\Admin\UpdateShopRequest;
+use App\Models\MaintenanceRequest;
 use App\Models\Shop;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -15,10 +16,17 @@ class ShopController extends Controller
 {
     public function index(): JsonResponse
     {
-        $shops = Shop::withCount('maintenanceRequests')->latest()->paginate(15);
+        $shops = Shop::withCount('maintenanceRequests')
+            ->withCount(['maintenanceRequests as active_requests_count' => function ($query) {
+                $query->whereIn('status', MaintenanceRequest::ACTIVE_STATUSES);
+            }])
+            ->orderByDesc('rating')
+            ->paginate(15);
+
         $shops->getCollection()->transform(function ($shop) {
-            $shop->image_url    = $shop->image_path ? url('storage/' . $shop->image_path) : null;
-            $shop->orders_count = $shop->maintenance_requests_count;
+            $shop->image_url          = $shop->image_path ? url('storage/' . $shop->image_path) : null;
+            $shop->orders_count       = $shop->maintenance_requests_count;
+            $shop->availability_status = $shop->active_requests_count > 0 ? 'busy' : 'available';
             return $shop;
         });
 

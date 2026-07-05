@@ -14,7 +14,9 @@ class AccessoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         // Senior Trick: فلترة ذكية حسب الصالة إذا أرسل تطبيق الموبايل رقم الصالة في الرابط
-        $query = Accessory::with('shop:id,name,address')->where('is_active', true);
+        $query = Accessory::with('shop:id,name,address')
+            ->where('is_active', true)
+            ->whereHas('shop', fn ($q) => $q->where('is_active', true));
 
         if ($request->has('shop_id')) {
             $query->where('shop_id', (int) $request->input('shop_id'));
@@ -32,6 +34,7 @@ class AccessoryController extends Controller
     {
         $accessory = Accessory::with('shop:id,name,address,phone')
             ->where('is_active', true)
+            ->whereHas('shop', fn ($q) => $q->where('is_active', true))
             ->findOrFail($id);
 
         return response()->json([

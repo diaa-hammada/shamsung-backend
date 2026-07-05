@@ -28,10 +28,10 @@ class CartController extends Controller
     {
         /** @var \App\Models\Customer $customer */
         $customer = auth()->user();
-        $accessory = Accessory::findOrFail($request->validated('accessory_id'));
+        $accessory = Accessory::with('shop')->findOrFail($request->validated('accessory_id'));
         $requestedQuantity = (int) $request->validated('quantity');
 
-        if (!$accessory->is_active || $accessory->stock_quantity < $requestedQuantity) {
+        if (!$accessory->is_active || !$accessory->shop?->is_active || $accessory->stock_quantity < $requestedQuantity) {
             return response()->json([
                 'message' => 'Product is unavailable or insufficient stock.'
             ], 400);

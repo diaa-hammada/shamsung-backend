@@ -17,6 +17,9 @@ class CheckoutRequest extends FormRequest
     {
         return [
             'payment_method' => ['required', 'string', 'in:cash_on_delivery,pay_after_service'],
+            'latitude'       => ['required', 'numeric', 'between:-90,90'],
+            'longitude'      => ['required', 'numeric', 'between:-180,180'],
+            'address'        => ['nullable', 'string', 'max:255'],
         ];
     }
 }

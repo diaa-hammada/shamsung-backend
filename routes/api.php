@@ -26,6 +26,10 @@ Route::prefix('v1/customer')->group(function () {
 
         Route::get('/deliveries', [\App\Http\Controllers\Api\V1\Customer\DeliveryController::class, 'index']);
         Route::get('/deliveries/{id}', [\App\Http\Controllers\Api\V1\Customer\DeliveryController::class, 'show']);
+
+        Route::get('/notifications', [\App\Http\Controllers\Api\V1\Customer\NotificationController::class, 'index']);
+        Route::post('/notifications/mark-all-read', [\App\Http\Controllers\Api\V1\Customer\NotificationController::class, 'markAllRead']);
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\V1\Customer\NotificationController::class, 'markRead']);
     });
 });
 
@@ -59,7 +63,7 @@ Route::prefix('v1/technician')->group(function () {
     Route::post('/send-otp', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'sendOtp']);
     Route::post('/verify-otp', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'verifyOtp']);
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'technician.last_seen'])->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'logout']);
         Route::get('/profile', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'profile']);
         Route::post('/fcm-token', [\App\Http\Controllers\Api\V1\TechnicianAuthController::class, 'updateFcmToken']);
@@ -116,18 +120,21 @@ Route::prefix('v1/admin')->group(function () {
         Route::post('/shops', [\App\Http\Controllers\Api\V1\Admin\ShopController::class, 'store']);
         Route::put('/shops/{id}', [\App\Http\Controllers\Api\V1\Admin\ShopController::class, 'update']);
         Route::delete('/shops/{id}', [\App\Http\Controllers\Api\V1\Admin\ShopController::class, 'destroy']);
+        Route::post('/shops/{id}/delete', [\App\Http\Controllers\Api\V1\Admin\ShopController::class, 'destroy']);
 
         // Technicians
         Route::get('/technicians', [\App\Http\Controllers\Api\V1\Admin\TechnicianController::class, 'index']);
         Route::post('/technicians', [\App\Http\Controllers\Api\V1\Admin\TechnicianController::class, 'store']);
         Route::post('/technicians/{id}', [\App\Http\Controllers\Api\V1\Admin\TechnicianController::class, 'update']);
         Route::delete('/technicians/{id}', [\App\Http\Controllers\Api\V1\Admin\TechnicianController::class, 'destroy']);
+        Route::post('/technicians/{id}/delete', [\App\Http\Controllers\Api\V1\Admin\TechnicianController::class, 'destroy']);
 
         // Spare Parts & Stock Requests (FR-29, FR-30)
         Route::get('/spare-parts', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'index']);
         Route::post('/spare-parts', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'store']);
         Route::put('/spare-parts/{id}', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'update']);
         Route::delete('/spare-parts/{id}', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'destroy']);
+        Route::post('/spare-parts/{id}/delete', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'destroy']);
         Route::get('/stock-requests', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'indexStockRequests']);
         Route::post('/stock-requests', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'requestStock']);
         Route::post('/stock-requests/{id}/approve', [\App\Http\Controllers\Api\V1\Admin\SparePartController::class, 'approveStockRequest']);
@@ -137,12 +144,14 @@ Route::prefix('v1/admin')->group(function () {
         Route::post('/accessories', [\App\Http\Controllers\Api\V1\Admin\AccessoryController::class, 'store']);
         Route::put('/accessories/{id}', [\App\Http\Controllers\Api\V1\Admin\AccessoryController::class, 'update']);
         Route::delete('/accessories/{id}', [\App\Http\Controllers\Api\V1\Admin\AccessoryController::class, 'destroy']);
+        Route::post('/accessories/{id}/delete', [\App\Http\Controllers\Api\V1\Admin\AccessoryController::class, 'destroy']);
 
         // Delivery Workers
         Route::get('/delivery-workers', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'index']);
         Route::post('/delivery-workers', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'store']);
         Route::put('/delivery-workers/{id}', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'update']);
         Route::delete('/delivery-workers/{id}', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'destroy']);
+        Route::post('/delivery-workers/{id}/delete', [\App\Http\Controllers\Api\V1\Admin\DeliveryWorkerController::class, 'destroy']);
 
         // Notifications
         Route::get('/notifications', [\App\Http\Controllers\Api\V1\Admin\AdminNotificationController::class, 'index']);

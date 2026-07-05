@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class FcmService
@@ -86,12 +85,33 @@ class FcmService
         ];
 
         try {
-            $response = Http::withToken($accessToken)->timeout(10)->post($url, $payload);
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => json_encode($payload),
+                CURLOPT_HTTPHEADER     => [
+                    'Authorization: Bearer ' . $accessToken,
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ],
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_TIMEOUT        => 10,
+            ]);
 
-            if (! $response->successful()) {
+            $body     = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr  = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlErr) {
+                Log::error('FcmService: dispatch cURL error', ['error' => $curlErr]);
+            } elseif ($httpCode < 200 || $httpCode >= 300) {
                 Log::warning('FcmService: send failed', [
-                    'status' => $response->status(),
-                    'body'   => $response->json(),
+                    'status' => $httpCode,
+                    'body'   => json_decode($body, true),
                 ]);
             }
         } catch (\Throwable $e) {
@@ -108,17 +128,40 @@ class FcmService
     private function fetchAccessToken(): ?string
     {
         try {
-            $jwt      = $this->buildJwt(time());
-            $response = Http::asForm()->timeout(15)->post('https://oauth2.googleapis.com/token', [
-                'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                'assertion'  => $jwt,
+            $jwt = $this->buildJwt(time());
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => 'https://oauth2.googleapis.com/token',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => http_build_query([
+                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    'assertion'  => $jwt,
+                ]),
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/x-www-form-urlencoded'],
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_TIMEOUT        => 15,
             ]);
 
-            if ($response->successful()) {
-                return $response->json('access_token');
+            $body     = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr  = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlErr) {
+                Log::error('FcmService: OAuth2 cURL error', ['error' => $curlErr]);
+                return null;
             }
 
-            Log::error('FcmService: OAuth2 token fetch failed', ['body' => $response->body()]);
+            $data = json_decode($body, true);
+
+            if ($httpCode === 200 && isset($data['access_token'])) {
+                return $data['access_token'];
+            }
+
+            Log::error('FcmService: OAuth2 token fetch failed', ['status' => $httpCode, 'body' => $body]);
             return null;
         } catch (\Throwable $e) {
             Log::error('FcmService: OAuth2 exception', ['message' => $e->getMessage()]);

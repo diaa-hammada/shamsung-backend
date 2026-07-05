@@ -12,11 +12,14 @@ use App\Models\Admin;
 use App\Models\Notification;
 use App\Models\SparePart;
 use App\Models\StockRequest;
+use App\Services\FcmService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SparePartController extends Controller
 {
+    public function __construct(private readonly FcmService $fcm) {}
+
     public function index(): JsonResponse
     {
         $spareParts = SparePart::with('shop:id,name')->latest()->paginate(15);
@@ -80,18 +83,26 @@ class SparePartController extends Controller
         $shopName      = $stockRequest->shop->name;
         $quantity      = $stockRequest->quantity;
 
-        Admin::all()->each(function (Admin $admin) use ($stockRequest, $quantity, $sparePartName, $shopName) {
+        $adminTitle = 'طلب توريد جديد';
+        $adminBody  = "تم طلب {$quantity} وحدة من {$sparePartName} لصالة {$shopName}";
+        $adminData  = ['type' => 'stock_request', 'id' => (string) $stockRequest->id];
+
+        Admin::all()->each(function (Admin $admin) use ($stockRequest, $adminTitle, $adminBody, $adminData) {
             Notification::create([
                 'admin_id' => $admin->id,
                 'type'     => 'stock_request',
-                'title'    => 'طلب توريد جديد',
-                'body'     => "تم طلب {$quantity} وحدة من {$sparePartName} لصالة {$shopName}",
+                'title'    => $adminTitle,
+                'body'     => $adminBody,
                 'data'     => [
                     'stock_request_id' => $stockRequest->id,
                     'shop_id'          => $stockRequest->shop_id,
                     'spare_part_id'    => $stockRequest->spare_part_id,
                 ],
             ]);
+
+            if ($admin->fcm_token) {
+                $this->fcm->send($admin->fcm_token, $adminTitle, $adminBody, $adminData);
+            }
         });
 
         return response()->json([
